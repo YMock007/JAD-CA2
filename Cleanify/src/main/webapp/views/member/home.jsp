@@ -14,18 +14,20 @@
             background: linear-gradient(#eceffe, #ced6fb);
 }
 
-
+		
+		.container{
+			max-width: 1280px;
+			margin: 0 auto;
+		}
+		
         /* Intro Section */
         #intro-section {
             min-height: 82vh;
-            display: flex;
+            display: grid;
             align-items: center;
             justify-content: space-between;
             padding: 2rem;
-        }
-
-        .intro-text-container {
-            width: 50%;
+            grid-template-columns: 1fr 1fr;
         }
 
         .intro-title {
@@ -159,7 +161,7 @@
         <%@ include file="/views/Util/components/header/header.jsp" %>
 
     <!-- Intro Section -->
-    <div id="intro-section">
+    <div id="intro-section" class="container">
         <div class="intro-text-container">
             <h2 class="intro-title"><span>Welcome to</span> Cleanify!</h2>
             <p class="intro-description">
@@ -173,7 +175,7 @@
     </div>
 
     <!-- How We Care and How We Clean Sections -->
-	<section class="services-section">
+	<section class="services-section  container">
 	    <h2 class="section-header text-center">Our Commitment to Excellence</h2>
 	    <div class="service-cards-container">
 
@@ -197,7 +199,7 @@
 
 
     <!-- Testimonials Section -->
-    <div class="testimonials-section">
+    <div class="testimonials-section container">
         <h2 >What Our Clients Say</h2>
         <div class="testimonial-container">
             <div class="testimonial">

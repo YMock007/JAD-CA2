@@ -22,7 +22,6 @@ public class BookingServlet extends HttpServlet {
             // Retrieve form parameters and validate them
             String memberIdStr = request.getParameter("memberId");
             int memberId = Integer.parseInt(memberIdStr);
-            int cleanerId = Integer.parseInt(request.getParameter("cleanerId"));
             String phoneNumber = request.getParameter("phoneNumber");
             String address = request.getParameter("address");
             String postalCode = request.getParameter("postalCode");
@@ -74,7 +73,7 @@ public class BookingServlet extends HttpServlet {
 
                     // Create booking entry for each service
                     boolean isCreated = BookingList.createBooking(
-                            memberId, cleanerId, serviceId, statusId,
+                            memberId, serviceId, statusId,
                             dateRequested, timeRequested, phoneNumber,
                             address, postalCode, specialRequest
                     );

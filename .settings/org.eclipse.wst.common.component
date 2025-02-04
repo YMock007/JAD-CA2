@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JAD-CA2">
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/Cleanify/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/cleanify-ws/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/cleanify-ws/src/test/java"/>
+        <property name="context-root" value="JAD-CA2"/>
+        <property name="java-output-path" value="/JAD-CA2/bin"/>
+    </wb-module>
+</project-modules>

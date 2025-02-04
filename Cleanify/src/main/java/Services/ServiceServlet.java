@@ -238,6 +238,6 @@ public class ServiceServlet extends HttpServlet {
     }
 
     private void redirectToDashboard(HttpServletResponse response, HttpServletRequest request) throws IOException {
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
     }
 }

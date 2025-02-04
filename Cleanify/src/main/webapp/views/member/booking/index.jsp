@@ -96,136 +96,143 @@
     <%@ include file="/views/Util/components/header/header.jsp" %>
     <%@ include file="/views/Util/notification.jsp" %>
 
-    <h1>My Bookings</h1>
+    <div class="container">
+    	<h1>My Bookings</h1>
 
-    <%
-        // Retrieve the list of bookings
-        List<Booking> bookings = BookingList.getBookingsByUser(person.getId());
-    %>
-
-    <!-- Only show filter if there are bookings -->
-    <% if (bookings != null && !bookings.isEmpty()) { %>
-        <!-- Filter by Status -->
-        <label for="statusId">Filter by Status:</label>
-        <select id="statusId" class="form-select w-auto">
-            <option value="">All</option>
-            <option value="1" <% if ("1".equals(request.getParameter("statusId"))) { %>selected<% } %>>Pending</option>
-            <option value="2" <% if ("2".equals(request.getParameter("statusId"))) { %>selected<% } %>>Completed</option>
-            <option value="3" <% if ("3".equals(request.getParameter("statusId"))) { %>selected<% } %>>Cancelled</option>
-        </select>
-    <% } %>
-
-    <table class="table table-bordered table-hover table-striped">
-        <tbody>
-		    <%
-		        // Retrieve the filter status
-		        String statusFilter = request.getParameter("statusId");
-		
-		        // If status is provided, filter the list
-		        if (statusFilter != null && !statusFilter.isEmpty()) {
-		            bookings = bookings.stream()
-		                                .filter(booking -> booking.getStatusId() == Integer.parseInt(statusFilter))
-		                                .collect(Collectors.toList());
-		        }
-		
-		        int index = 1;
-		        if (bookings != null && !bookings.isEmpty()) {
-		    %>
-		    <thead>
-		        <tr>
-		            <th>#</th>
-		            <th>Cleaner</th>
-		            <th>Service</th>
-		            <th>Status</th>
-		            <th>Date</th>
-		            <th>Time</th>
-		            <th>Address</th>
-		            <th>Remark</th>
-		            <th>Action</th>
-		        </tr>
-		    </thead>
-		    <tbody>
-		        <%
-		            for (Booking booking : bookings) {
-		                String bookingStatus = booking.getStatusId() == 1 ? "Pending" :
-		                                       booking.getStatusId() == 2 ? "Completed" :
-		                                       "Cancelled";
-		                String serviceName = ServiceList.getServiceById(booking.getServiceId()).getName();
-		                String cleanerName = PersonList.getPersonById(booking.getProviderId()).getName();
-		        %>
-		        <tr>
-		            <td><%= index++ %></td>
-		            <td><%= cleanerName %></td>
-		            <td><%= serviceName %></td>
-		            <td><%= bookingStatus %></td>
-		            <td><%= booking.getDateRequested() %></td>
-		            <td><%= booking.getTimeRequested() %></td>
-		            <td><%= booking.getAddress() %></td>
-		            <td><%= booking.getRemark() %></td>
-		            <td>
-		                <% 
-		                    boolean reviewExists = ReviewList.isReviewPresentForBooking(booking.getId());
-		                    if (booking.getStatusId() == 2 && !reviewExists) { 
-		                %>
-		                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal" data-booking-id="<%= booking.getId() %>">Review</button>
-		                <% 
-		                    } else if (reviewExists) { 
-		                %>
-		                    <button class="btn btn-secondary" disabled>Reviewed</button>
-		                <% 
-		                    } else { 
-		                %>
-		                    <button class="btn btn-secondary" disabled>Not Available</button>
-		                <% } %>
-		            </td>
-		        </tr>
-		        <%
-		            }
-		        %>
-		    </tbody>
-		    <% 
-		        } else {
-		    %>
-		        <tr>
-		            <td colspan="9">No bookings found.</td>
-		        </tr>
-		    <% 
-		        }
-		    %>
-		</tbody>
-
-    </table>
-
-    <!-- Review Modal -->
-    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="${pageContext.request.contextPath}/reviewServlet" method="post">
-                    <input type="hidden" name="action" value="create">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="reviewModalLabel">Give Review</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="bookingId" id="modalBookingId">
-                        <div class="rating-stars">
-                            <% for (int i = 1; i <= 5; i++) { %>
-                                <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>">
-                                <label for="star<%= i %>">&#9733;</label>
-                            <% } %>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label for="reviewContent">Review:</label>
-                            <textarea name="reviewContent" id="reviewContent" class="form-control" rows="3" required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit Review</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+	    <%
+	        // Retrieve the list of bookings
+	        List<Booking> bookings = BookingList.getBookingsByUser(person.getId());
+	    %>
+	
+	    <!-- Only show filter if there are bookings -->
+	    <% if (bookings != null && !bookings.isEmpty()) { %>
+	        <!-- Filter by Status -->
+	        <label for="statusId">Filter by Status:</label>
+	        <select id="statusId" class="form-select w-auto">
+	            <option value="">All</option>
+	            <option value="1" <% if ("1".equals(request.getParameter("statusId"))) { %>selected<% } %>>Pending</option>
+	            <option value="2" <% if ("2".equals(request.getParameter("statusId"))) { %>selected<% } %>>Completed</option>
+	            <option value="3" <% if ("3".equals(request.getParameter("statusId"))) { %>selected<% } %>>Cancelled</option>
+	        </select>
+	    <% } %>
+	
+	    <table class="table table-bordered table-hover table-striped">
+	        <tbody>
+			    <%
+			        // Retrieve the filter status
+			        String statusFilter = request.getParameter("statusId");
+			
+			        // If status is provided, filter the list
+			        if (statusFilter != null && !statusFilter.isEmpty()) {
+			            bookings = bookings.stream()
+			                                .filter(booking -> booking.getStatusId() == Integer.parseInt(statusFilter))
+			                                .collect(Collectors.toList());
+			        }
+			
+			        int index = 1;
+			        if (bookings != null && !bookings.isEmpty()) {
+			    %>
+			    <thead>
+			        <tr>
+			            <th>#</th>
+			            <th>Cleaner</th>
+			            <th>Service</th>
+			            <th>Status</th>
+			            <th>Date</th>
+			            <th>Time</th>
+			            <th>Address</th>
+			            <th>Remark</th>
+			            <th>Action</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <%
+			            for (Booking booking : bookings) {
+			                String bookingStatus = booking.getStatusId() == 1 ? "Pending" :
+			                                       booking.getStatusId() == 2 ? "Completed" :
+			                                       "Cancelled";
+			                String serviceName = ServiceList.getServiceById(booking.getServiceId()).getName();
+			                String cleanerName = "";
+			                if(booking.getProviderId()==0){
+			                	cleanerName = "TBD";
+			                }else{
+			                	cleanerName = PersonList.getPersonById(booking.getProviderId()).getName();
+			                }
+			        %>
+			        <tr>
+			            <td><%= index++ %></td>
+			            <td><%= cleanerName %></td>
+			            <td><%= serviceName %></td>
+			            <td><%= bookingStatus %></td>
+			            <td><%= booking.getDateRequested() %></td>
+			            <td><%= booking.getTimeRequested() %></td>
+			            <td><%= booking.getAddress() %></td>
+			            <td><%= booking.getRemark() %></td>
+			            <td>
+			                <% 
+			                    boolean reviewExists = ReviewList.isReviewPresentForBooking(booking.getId());
+			                    if (booking.getStatusId() == 2 && !reviewExists) { 
+			                %>
+			                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal" data-booking-id="<%= booking.getId() %>">Review</button>
+			                <% 
+			                    } else if (reviewExists) { 
+			                %>
+			                    <button class="btn btn-secondary" disabled>Reviewed</button>
+			                <% 
+			                    } else { 
+			                %>
+			                    <button class="btn btn-secondary" disabled>Not Available</button>
+			                <% } %>
+			            </td>
+			        </tr>
+			        <%
+			            }
+			        %>
+			    </tbody>
+			    <% 
+			        } else {
+			    %>
+			        <tr>
+			            <td colspan="9">No bookings found.</td>
+			        </tr>
+			    <% 
+			        }
+			    %>
+			</tbody>
+	
+	    </table>
+	
+	    <!-- Review Modal -->
+	    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <form action="${pageContext.request.contextPath}/reviewServlet" method="post">
+	                    <input type="hidden" name="action" value="create">
+	                    <div class="modal-header">
+	                        <h5 class="modal-title" id="reviewModalLabel">Give Review</h5>
+	                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	                    </div>
+	                    <div class="modal-body">
+	                        <input type="hidden" name="bookingId" id="modalBookingId">
+	                        <div class="rating-stars">
+	                            <% for (int i = 1; i <= 5; i++) { %>
+	                                <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>">
+	                                <label for="star<%= i %>">&#9733;</label>
+	                            <% } %>
+	                        </div>
+	                        <div class="form-group mt-3">
+	                            <label for="reviewContent">Review:</label>
+	                            <textarea name="reviewContent" id="reviewContent" class="form-control" rows="3" required></textarea>
+	                        </div>
+	                    </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                        <button type="submit" class="btn btn-primary">Submit Review</button>
+	                    </div>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
     </div>
 
     <script src="<%= request.getContextPath() %>/views/member/booking/index.js" type="text/javascript"></script>

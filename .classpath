@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Cleanify/src/main/java"/>
+	<classpathentry kind="src" path="cleanify-ws/src/main/java"/>
+	<classpathentry kind="src" path="cleanify-ws/src/test/java"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/cloudinary-core-1.30.0.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/cloudinary-http44-1.30.0.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/httpclient-4.5.1.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/httpcore-4.4.3.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/httpmime-4.5.1.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/jbcrypt-0.4.jar"/>
+	<classpathentry kind="lib" path="Cleanify/src/main/webapp/WEB-INF/lib/postgresql-42.7.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

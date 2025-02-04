@@ -55,9 +55,9 @@
 
         /* Service Detail */
         .service-detail {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            display: grid;
+            grid-template-columns : 1fr 1fr;
+            align-items: start;
             gap: 1.5rem;
             border-radius: 20px;
             width: 100%;
@@ -68,6 +68,7 @@
             width: 100%;
             min-width: 500px;
             min-height: 300px;
+            height: auto;
             overflow: hidden;
             border-radius: 10px;
         }
@@ -83,7 +84,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
             text-align: center;
         }
 

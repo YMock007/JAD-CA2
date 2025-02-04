@@ -24,10 +24,9 @@ public class Booking {
         this.remark = remark;
     }
     
-    public Booking(int requesterId, int providerId, int serviceId, int statusId, Date dateRequested,
+    public Booking(int requesterId, int serviceId, int statusId, Date dateRequested,
 			Time timeRequested, String phNumber, String address, String postalCode, String remark) {
 		this.requesterId = requesterId;
-		this.providerId = providerId;
 		this.serviceId = serviceId;
 		this.statusId = statusId;
 		this.dateRequested = dateRequested;

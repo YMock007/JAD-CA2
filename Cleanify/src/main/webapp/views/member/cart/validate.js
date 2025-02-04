@@ -1,6 +1,6 @@
 // Get today's date and set it to tomorrow
 const today = new Date();
-today.setDate(today.getDate() + 1); // Set to tomorrow (exclude today)
+today.setDate(today.getDate() + 1); 
 
 // Format date as YYYY-MM-DD
 const formattedDate = today.toISOString().split('T')[0];
@@ -13,7 +13,6 @@ function validateForm() {
     let phoneNumber = document.getElementById('phoneNumber').value.trim();
     let postalCode = document.getElementById('postalCode').value.trim();
     let appointmentDate = document.getElementById('appointmentDate').value;
-    let cleanerId = document.getElementById('cleanerId').value;
     let serviceId = document.getElementById('serviceId').value;
     let address = document.getElementById('address').value.trim();
     let appointmentTime = document.getElementById('appointmentTime').value.trim();
@@ -23,7 +22,6 @@ function validateForm() {
     sessionStorage.removeItem('phoneNumberError');
     sessionStorage.removeItem('postalCodeError');
     sessionStorage.removeItem('appointmentDateError');
-    sessionStorage.removeItem('cleanerIdError');
     sessionStorage.removeItem('serviceIdError');
     sessionStorage.removeItem('addressError');
     sessionStorage.removeItem('appointmentTimeError');
@@ -47,12 +45,6 @@ function validateForm() {
     selectedDate.setHours(0, 0, 0, 0); // Strip time for comparison
     if (selectedDate < todayDate) {
         sessionStorage.setItem('appointmentDateError', 'Please select a future appointment date.');
-        valid = false;
-    }
-
-    // Validate cleaner selection (must be selected)
-    if (!cleanerId) {
-        sessionStorage.setItem('cleanerIdError', 'Please select a cleaner.');
         valid = false;
     }
 
@@ -87,7 +79,6 @@ window.onload = function () {
     let phoneError = sessionStorage.getItem('phoneNumberError');
     let postalError = sessionStorage.getItem('postalCodeError');
     let dateError = sessionStorage.getItem('appointmentDateError');
-    let cleanerError = sessionStorage.getItem('cleanerIdError');
     let serviceError = sessionStorage.getItem('serviceIdError');
     let addressError = sessionStorage.getItem('addressError');
     let timeError = sessionStorage.getItem('appointmentTimeError');
@@ -101,9 +92,6 @@ window.onload = function () {
     }
     if (dateError) {
         document.getElementById('appointmentDate').setCustomValidity(dateError);
-    }
-    if (cleanerError) {
-        document.getElementById('cleanerId').setCustomValidity(cleanerError);
     }
     if (serviceError) {
         document.getElementById('serviceId').setCustomValidity(serviceError);

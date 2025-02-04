@@ -31,42 +31,32 @@ INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_i
     ('grace_blue', 'password333', 'grace@example.com', '6789012345', '606 Fir St', '789012', 1, FALSE),
     ('hank_gray', 'password444', 'hank@example.com', NULL, '707 Poplar St', '890123', 2, FALSE);
 
-
-  
 -- Insert sample services 
 INSERT INTO Service (name, category_id, description, price, image_url, est_duration) VALUES 
-    -- Cleaning Services
-    ('Home Cleaning', 1, 'Our home cleaning service offers a thorough and deep cleaning for residential spaces, including dusting, vacuuming, mopping, and sanitation of key areas. We ensure your home is sparkling clean and free from allergens, using eco-friendly cleaning products.', 100.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/homeCleaning.jpg', 2),
-    
-    -- Repair Services
-    ('Plumbing Repair', 2, 'Our plumbing repair service covers a wide range of issues, from fixing leaks and clogged drains to repairing pipes and installing new fixtures. We are experienced in handling both minor repairs and more complex plumbing challenges to keep your home running smoothly.', 120.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PlumbingRepair.jpg', 3),
-    ('Electrical Repair', 2, 'Our electrical repair service includes troubleshooting, diagnostics, and fixing electrical issues such as faulty wiring, circuit problems, and malfunctioning outlets. We prioritize safety and ensure that all repairs are done to code and meet industry standards.', 140.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/ElectricalRepair.jpg', 4),
+    ('Home Cleaning', 1, 'Deep cleaning for residential spaces.', 100.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/homeCleaning.jpg', 2),
+    ('Plumbing Repair', 2, 'Fix leaks, clogs, and pipe repairs.', 120.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PlumbingRepair.jpg', 3),
+    ('Electrical Repair', 2, 'Troubleshoot and fix electrical issues.', 140.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/ElectricalRepair.jpg', 4),
+    ('HVAC Maintenance', 3, 'Regular check-ups and maintenance.', 120.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/HVACMaintenance.jpg', 3),
+    ('Lawn Maintenance', 3, 'Mowing, trimming, and lawn care.', 70.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/LawnMaintenance.jpg', 2),
+    ('Pool Maintenance', 3, 'Cleaning and chemical balancing.', 130.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PoolMaintenance.jpg', 4),
+    ('Pest Control', 4, 'Safe and effective pest extermination.', 110.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PestControl.jpg', 2),
+    ('Appliance Installation', 5, 'Professional appliance setup.', 150.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/ApplianceInstallation.jpg', 3),
+    ('Furniture Assembly', 5, 'Secure assembly of furniture.', 130.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/furnitureAssembly.jpg', 1);
 
-    -- Maintenance Services
-    ('HVAC Maintenance', 3, 'Our HVAC maintenance service provides comprehensive care for your heating, ventilation, and air conditioning systems. This includes cleaning, filter replacement, and system checks to ensure optimal efficiency and prevent unexpected breakdowns, helping you save on energy costs.', 120.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/HVACMaintenance.jpg', 3),
-    ('Lawn Maintenance', 3, 'Our lawn maintenance service includes everything from mowing, edging, and trimming to ensuring the health of your lawn with proper fertilization and weed control. We work with you to create a customized care plan for a lush, green lawn all year round.', 70.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/LawnMaintenance.jpg', 2),
-    ('Pool Maintenance', 3, 'Our pool maintenance service includes regular cleaning, debris removal, and chemical balancing to keep your pool safe, clean, and ready for swimming. We ensure your pool’s filtration system is in top condition and that water quality is maintained to the highest standards.', 130.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PoolMaintenance.jpg', 4),
-
-    -- Pest Control Services
-    ('Pest Control', 4, 'Our pest control service provides a comprehensive approach to eliminating and preventing pests in your home. We offer treatments for a wide range of pests, including ants, termites, rodents, and bedbugs, using safe and effective methods to keep your home pest-free.', 110.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/PestControl.jpg', 2),
-
-    -- Installation Services
-    ('Appliance Installation', 5, 'Our appliance installation service ensures that your new home appliances, such as refrigerators, ovens, dishwashers, and washing machines, are properly set up and ready to use. Our professionals handle the installation with care, ensuring everything works efficiently and safely.', 150.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/ApplianceInstallation.jpg', 3),
-    ('Furniture Assembly', 5, 'Our furniture assembly service includes the careful and precise assembly of various types of furniture, from bedroom sets and desks to bookcases and dining tables. We follow the manufacturer’s instructions to ensure your furniture is securely assembled and ready for use.', 130.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/furnitureAssembly.jpg', 1);
-
--- Insert additional bookings with remarks
+-- Insert sample bookings (No provider assigned, Status = Pending)
 INSERT INTO Booking (requester_id, provider_id, service_id, status_id, date_requested, time_requested, phNumber, address, postalCode, remark) VALUES
-    (2, 2, 2, 2, '2024-11-23', '09:00:00', '3456789012', '456 Elm St', '654321', 'Customer requested a follow-up call after service'),
-    (4, 5, 5, 2, '2024-11-24', '10:00:00', '4567890123', '789 Oak St', '789012', 'Preferred timing was adjusted upon provider request'),
-    (6, 8, 7, 2, '2024-11-25', '11:00:00', '5678901234', '202 Maple St', '890123', 'Requested eco-friendly cleaning materials'),
-    (7, 2, 8, 2, '2024-11-26', '14:00:00', '6789012345', '303 Birch St', '456789', 'Asked for a detailed receipt post service'),
-    (10, 5, 1, 2, '2024-11-27', '15:00:00', '7890123456', '404 Cedar St', '567890', 'Customer will be on-site for supervision'),
-    (1, 8, 9, 2, '2024-11-28', '16:00:00', '8901234567', '505 Palm St', '678901', 'Requested additional equipment for service');
+    (1, NULL, 1, 1, '2024-12-01', '09:00:00', '1234567890', '123 Main St', '123456', 'Customer requested eco-friendly cleaning'),
+    (2, NULL, 3, 1, '2024-12-02', '10:00:00', '2345678901', '456 Elm St', '654321', 'Electrical inspection needed'),
+    (3, NULL, 5, 1, '2024-12-03', '11:00:00', '3456789012', '789 Oak St', '789012', 'Lawn maintenance for front and backyard'),
+    (4, NULL, 7, 1, '2024-12-04', '14:00:00', '4567890123', '202 Maple St', '890123', 'Emergency pest control service'),
+    (5, NULL, 8, 1, '2024-12-05', '15:00:00', '5678901234', '303 Birch St', '456789', 'Appliance installation for new fridge'),
+    (6, NULL, 2, 1, '2024-12-06', '16:00:00', '6789012345', '404 Cedar St', '567890', 'Plumbing leak in the kitchen'),
+    (7, NULL, 4, 1, '2024-12-07', '17:00:00', '7890123456', '505 Palm St', '678901', 'HVAC maintenance before winter'),
+    (8, NULL, 6, 1, '2024-12-08', '18:00:00', '8901234567', '606 Fir St', '789012', 'Pool maintenance before holiday season'),
+    (9, NULL, 9, 1, '2024-12-09', '19:00:00', '9012345678', '707 Poplar St', '890123', 'Furniture assembly for new apartment'),
+    (10, NULL, 1, 1, '2024-12-10', '20:00:00', '0123456789', '808 Willow St', '901234', 'Deep cleaning for move-in');
 
--- Insert additional reviews for completed bookings
-INSERT INTO Review (rating, content, booking_id) VALUES
-    (5, 'The plumber did an excellent job fixing the leak.', 1),
-    (4, 'Timely and professional service.', 2),
-    (3, 'Decent work, but there were some delays.', 3),
-    (5, 'Amazing service! Everything was perfect.', 4),
-    (4, 'Satisfied with the work, will hire again.', 5);
+-- Insert sample payment methods (For future use)
+INSERT INTO PaymentMethod (name) VALUES 
+    ('Bank Card'), 
+    ('QR Code');

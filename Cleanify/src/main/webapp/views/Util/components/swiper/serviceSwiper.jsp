@@ -138,7 +138,7 @@
               <form action="${pageContext.request.contextPath}/serviceServlet" method="GET">
                 <input type="hidden" name="service_id" value="<%= sService.getId() %>" />
                 <button type="submit" class="btn btn-sm">
-                  <img src="<%= request.getContextPath() + "/" + sService.getImageUrl() %>"
+                  <img src="<%= sService.getImageUrl() %>"
                        alt="<%= sService.getName() %>" class="card-image">
                   <p class="badge"><%= sService.getName() %></p>
                 </button>

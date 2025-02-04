@@ -26,20 +26,15 @@
             box-sizing: border-box;
         }
 
-        .container-fluid {
-            min-height: 70vh;
-            padding: 1.4rem;
-            background: linear-gradient(#ECEFFE, #CED6Fb);
-        }
-
         #main-section {
-            min-height: 60vh;
+        	max-width: 1280px;
+        	margin: 1.5rem auto;
+            min-height: 50vh;
             display: flex;
             align-items: space-between;
             justify-content: center;
             border: 1px solid black;
             box-shadow: 4px 5px 4px #474747;
-            margin: 3rem;
             border-radius: 1.4rem;
         }
 
@@ -53,9 +48,11 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            align-items: flex-end;
             background: var(--text-teal);
             border-top-left-radius: 1.4rem;
             border-bottom-left-radius: 1.4rem;
+            position: relative;
         }
         
         #headerForCartItems {
@@ -76,8 +73,8 @@
         }
 
         #cartItems {
-            min-height: 50vh;
-            height: 100%;
+            min-height: 30vh;
+            height: auto;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -121,6 +118,8 @@
             color: #fff;
             text-align: end;
             padding: 0 1.4rem 1.4rem;
+            position: absolute;
+            bottom: 20px;
         }
         
         
@@ -157,7 +156,7 @@
             background-color: #e8eeef;
             color: black;
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             outline: none;
         }
 
@@ -285,7 +284,7 @@
 		                                <input type="hidden" name="service_id" value="<%= service.getId() %>" />
 		                                <button class="cart-item" type="submit">
 		                                    <div id="cartImgContainer">
-		                                        <img src="<%= request.getContextPath() + '/' + service.getImageUrl() %>" alt="<%= service.getImageUrl() %>">
+		                                        <img src="<%=service.getImageUrl() %>" alt="<%= service.getName() %>" class="img-fluid rounded">
 		                                    </div>
 		                                    <div><%= service.getName() %></div>
 		                                    <div id="cartPrice">S$<%= service.getPrice() %></div>
@@ -313,36 +312,23 @@
 					        <input type="hidden" name="memberId" value="<%= person.getId() %>">
 					    
 					        <h1>Booking Form</h1>
-					        <div class="form-group">
-					            <label for="cleanerId">Cleaner</label>
-					            <select class="form-select" name="cleanerId" id="cleanerId" style="font-size : 14px;" required>
-					                <option value="" selected disabled>Select a cleaner</option>
-					                <% 
-					                    for(Person cleaner : PersonList.getAllCleaners()) { 
-					                %>
-					                    <option value="<%= cleaner.getId() %>"><%= cleaner.getName() %></option>
-					                <% 
-					                    }
-					                %>
-					            </select>
-					        </div>
 					    
 					        <!-- Phone Number Input -->
 					        <div class="form-group">
 					            <label for="phoneNumber">Phone Number</label>
-					            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" pattern="\d{8}" placeholder="Enter your phone number" required>
+					            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" pattern="\d{8}" required>
 					        </div>
 					    
 					        <!-- Address Input -->
 					        <div class="form-group">
 					            <label for="address">Address</label>
-					            <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address" required>
+					            <input type="text" class="form-control" id="address" name="address" required>
 					        </div>
 					    
 					        <!-- Postal Code Input -->
 					        <div class="form-group">
 					            <label for="postalCode">Postal Code</label>
-					            <input type="text" class="form-control" id="postalCode" name="postalCode" pattern="\d{6}" placeholder="Enter your postal code" required>
+					            <input type="text" class="form-control" id="postalCode" name="postalCode" pattern="\d{6}" required>
 					        </div>
 					    
 					        <!-- Appointment Date Input -->
@@ -355,7 +341,7 @@
 					        <div class="form-group">
 					            <label for="appointmentTime">Appointment Time</label>
 					            <select class="form-select" id="appointmentTime" name="appointmentTime"  style="font-size : 14px;" required>
-					                <option value="" selected disabled>Select a time</option>
+					                <option value="" selected disabled></option>
 					                <% 
 					                    int startHour = 8;
 					                    int interval = 4;
@@ -388,7 +374,7 @@
 					        %>
 					    
 					        <!-- Submit Button -->
-					        <button type="submit" class="btn btn-primary" <% if (isBookingEmpty) { %> disabled <% } %>>Book Now</button>
+					        <button type="submit" class="btn btn-primary" <% if (isBookingEmpty) { %> disabled <% } %>>Checkout</button>
 					    </form>
 					</div>
 		        </div>
