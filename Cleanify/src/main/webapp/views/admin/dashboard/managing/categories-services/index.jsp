@@ -1,5 +1,5 @@
 <%@ include file="/views/Util/auth/adminAuth.jsp" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="Categories.*, Services.*" %>
 <%
 request.setAttribute("includedFromParent", true);
 %>
@@ -11,7 +11,7 @@ request.setAttribute("includedFromParent", true);
     <title>Manage Categories & Services</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/categories-services/index.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/managing/categories-services/index.css">
 </head>
 
 <body>
@@ -149,10 +149,10 @@ request.setAttribute("includedFromParent", true);
                 <% } %>
         </div>
     </div>
-	<%@ include file="/views/admin/dashboard/categories-services/modals.jsp" %>
-	<%@ include file="/views/admin/dashboard/categories-services/dynamicModals.jsp" %>
+	<%@ include file="/views/admin/dashboard/managing/categories-services/modals.jsp" %>
+	<%@ include file="/views/admin/dashboard/managing/categories-services/dynamicModals.jsp" %>
 	<%@ include file="/views/Util/notification.jsp" %>
-	<script src="<%= request.getContextPath() %>/views/admin/dashboard/categories-services/index.js" type="text/javascript"></script>
+	<script src="<%= request.getContextPath() %>/views/admin/dashboard/managing/categories-services/index.js" type="text/javascript"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

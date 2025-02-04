@@ -5,18 +5,32 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-     <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/index.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/managing/index.css">
 </head>
 <body>
 <%@ include file="/views/Util/components/header/header.jsp" %>
 
-    <div class="container my-5">
-        <h1 class="text-primary mb-4">Welcome to the Admin Dashboard</h1>
-        <div class="admin-links row">
-            <a href="categories-services/index.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Manage Categories & Services</a>
-            <a href="members/index.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Manage Members</a>
-            <a href="manageBookings.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Manage Bookings</a>
-            <a href="manageApplicants.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Manage Job Applicants</a>
+    <div class="container my-5">        
+        <!-- Managing Section -->
+        <div class="mb-5">
+            <h2 class="text-secondary mb-3">Management</h2>
+            <div class="admin-links row">
+                <a href="categories-services/index.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Categories & Services</a>
+                <a href="members/index.jsp" class="col-md-3 mb-3 btn btn-info btn-lg">Customers</a>
+                <a href="manageBookings.jsp" class="col-md-3 mb-3 btn btn-warning btn-lg">Bookings</a>
+                <a href="manageApplicants.jsp" class="col-md-3 mb-3 btn btn-success btn-lg">Workers</a>
+            </div>
+        </div>
+
+        <!-- Reporting Section -->
+        <div>
+            <h2 class="text-secondary mb-3">Reporting</h2>
+            <div class="admin-links row">
+                <a href="reportCategoriesServices.jsp" class="col-md-3 mb-3 btn btn-primary btn-lg">Categories & Services</a>
+                <a href="reportCustomers.jsp" class="col-md-3 mb-3 btn btn-info btn-lg">Customers</a>
+                <a href="reportBookings.jsp" class="col-md-3 mb-3 btn btn-warning btn-lg">Bookings</a>
+                <a href="reportWorkers.jsp" class="col-md-3 mb-3 btn btn-success btn-lg">Workers</a>
+            </div>
         </div>
     </div>
 

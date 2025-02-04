@@ -17,7 +17,7 @@ public class PersonServlet extends HttpServlet {
 
         if (action == null) {
             setSessionMessage(request, "No action specified.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
             return;
         }
 
@@ -34,11 +34,11 @@ public class PersonServlet extends HttpServlet {
                     break;
                 default:
                     setSessionMessage(request, "Unknown action.", "error");
-                    response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+                    response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
             }
         } catch (Exception e) {
             setSessionMessage(request, "Operation failed: " + e.getMessage(), "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
         }
     }
 
@@ -55,7 +55,7 @@ public class PersonServlet extends HttpServlet {
         // Check if email already exists
         if (PersonList.isEmailExists(email)) {
             setSessionMessage(request, "Email already exists. Please use a different email.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
             return;
         }
 
@@ -63,7 +63,7 @@ public class PersonServlet extends HttpServlet {
         Person person = new Person(name, password, email, phNumber, address, postalCode, roleId, isGoogleUser);
         PersonList.addPerson(person);
         setSessionMessage(request, "Person added successfully.", "success");
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
     }
 
     private void updatePerson(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -82,14 +82,14 @@ public class PersonServlet extends HttpServlet {
         // Validate if email is being changed and already exists
         if (!email.equals(existingPerson.getEmail()) && PersonList.isEmailExists(email)) {
             setSessionMessage(request, "Email already exists. Please use a different email.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
             return;
         }
 
         // Validate if all details are the same
         if (existingPerson.equals(new Person(id, name, null, email, phNumber, address, postalCode, roleId, isGoogleUser))) {
             setSessionMessage(request, "No changes detected. Please update at least one field.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
             return;
         }
 
@@ -97,14 +97,14 @@ public class PersonServlet extends HttpServlet {
         Person person = new Person(id, name, null, email, phNumber, address, postalCode, roleId, isGoogleUser);
         PersonList.updatePerson(person);
         setSessionMessage(request, "Person updated successfully.", "success");
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
     }
 
     private void deletePerson(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         PersonList.deletePerson(id);
         setSessionMessage(request, "Person deleted successfully.", "success");
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/members/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/members/index.jsp");
     }
 
     private void setSessionMessage(HttpServletRequest request, String message, String status) {

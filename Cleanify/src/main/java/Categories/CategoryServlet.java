@@ -19,7 +19,7 @@ public class CategoryServlet extends HttpServlet {
 
         if (action == null) {
             setSessionMessage(request, "No action specified.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             return;
         }
 
@@ -36,11 +36,11 @@ public class CategoryServlet extends HttpServlet {
                     break;
                 default:
                     setSessionMessage(request, "Unknown action.", "error");
-                    response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+                    response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             }
         } catch (Exception e) {
             setSessionMessage(request, "Operation failed: " + e.getMessage(), "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
         }
     }
 
@@ -48,13 +48,13 @@ public class CategoryServlet extends HttpServlet {
         String name = request.getParameter("name").trim(); // Trim whitespace
         if (name.isEmpty()) {
             setSessionMessage(request, "Category name cannot be empty.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             return;
         }
 
         if (CategoryList.isCategoryNameExists(name)) {
             setSessionMessage(request, "Category with name '" + name + "' already exists.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             return;
         }
 
@@ -69,7 +69,7 @@ public class CategoryServlet extends HttpServlet {
                 setSessionMessage(request, "Failed to add category: " + e.getMessage(), "error");
             }
         }
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
     }
 
     private void updateCategory(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -78,7 +78,7 @@ public class CategoryServlet extends HttpServlet {
 
         if (idStr == null || name == null || name.isEmpty()) {
             setSessionMessage(request, "Invalid category data.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             return;
         }
 
@@ -87,7 +87,7 @@ public class CategoryServlet extends HttpServlet {
 
             if (CategoryList.isCategoryNameExistsExcludingId(name, id)) {
                 setSessionMessage(request, "Category with name '" + name + "' already exists.", "error");
-                response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+                response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
                 return;
             }
 
@@ -98,7 +98,7 @@ public class CategoryServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             setSessionMessage(request, "Invalid category ID.", "error");
         }
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
     }
 
     private void deleteCategory(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -106,7 +106,7 @@ public class CategoryServlet extends HttpServlet {
 
         if (idStr == null) {
             setSessionMessage(request, "Category ID is required for deletion.", "error");
-            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
             return;
         }
 
@@ -118,7 +118,7 @@ public class CategoryServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             setSessionMessage(request, "Invalid category ID.", "error");
         }
-        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/categories-services/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/admin/dashboard/managing/categories-services/index.jsp");
     }
 
     private void setSessionMessage(HttpServletRequest request, String message, String status) {
