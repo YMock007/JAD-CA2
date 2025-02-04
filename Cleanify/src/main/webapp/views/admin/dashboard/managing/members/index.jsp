@@ -12,7 +12,7 @@ request.setAttribute("includedFromParent", true);
     <title>Manage Categories & Services</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/managing/members/index.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/views/admin/dashboard/members/index.css">
 </head>
 
 <body>
@@ -66,14 +66,14 @@ request.setAttribute("includedFromParent", true);
     </div>
 	
 	<!-- Include Modals -->
-	<%@ include file="/views/admin/dashboard/managing/members/modals.jsp" %>
-	<%@ include file="/views/admin/dashboard/managing/members/dynamicModals.jsp" %>
+	<%@ include file="/views/admin/dashboard/members/modals.jsp" %>
+	<%@ include file="/views/admin/dashboard/members/dynamicModals.jsp" %>
 
 	<!-- Notification (Optional) -->
 	<%@ include file="/views/Util/notification.jsp" %>
 	
 	<!-- Custom JS for the Page -->
-	<script src="<%= request.getContextPath() %>/views/admin/dashboard/managing/members/index.js" type="text/javascript"></script>
+	<script src="<%= request.getContextPath() %>/views/admin/dashboard/members/index.js" type="text/javascript"></script>
 	
 	<!-- jQuery and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
