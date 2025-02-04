@@ -1,0 +1,183 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    height: 100vh;
+    width : 100%
+}
+
+.overlay-container {
+    display: flex;
+    width: 100%;
+    height: 80%;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 25%;
+    background: rgba(0, 119, 182, 0.9);
+    color: white;
+    padding: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+    background: rgba(0, 82, 130, 0.9);
+}
+
+.form-container {
+    width: 100%;
+    padding: 40px;
+    background: #fff;
+    overflow-y: auto;
+}
+
+.tab-content {
+    display: none;
+    gap: 10px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 100%  
+}   
+
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+input:focus {
+    border-color: #0077B6; /* Add a blue border on focus */
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+input {
+    width: 50%;
+    padding: 15px; /* Increased padding for larger input fields */
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Rounded corners */
+    font-size: 16px;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    margin-bottom: 5px;
+}
+
+input:focus {
+    border-color: #0077B6;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+button.btn {
+    width: auto;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button.btn-primary {
+    background-color: #0077B6;
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-primary:hover {
+    background-color: #005f8c;
+}
+
+button.btn-danger {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-danger:hover {
+    background-color: #b52b2b;
+}
+
+button[disabled] {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+h2.form-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+button#editProfile {
+    margin-top: 20px;
+}
+
+button#updateProfileSection {
+    margin-top: 20px;
+}
+
+
+h2.form-title {
+    font-size: 28px; /* Larger and bold title */
+    margin-bottom: 20px; /* Space below title */
+    color: #333;
+    font-weight: bold;
+}
+
+
+
+
+.toggle-password:hover {
+    color: #0077B6; /* Change color on hover */
+}
+
+
+
+.toggle-password{
+    position: relative;
+    right: 40px;
+}
+
+
+.error-message {
+    color: red; /* Set text color to red */
+    font-size: 12px; /* Adjust font size */
+    margin-top: 5px; /* Add spacing between input and error message */
+    display: block; /* Ensure it takes up its own line */
+}
