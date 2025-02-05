@@ -84,18 +84,30 @@ CREATE TABLE PaymentMethod (
     name VARCHAR(50) NOT NULL UNIQUE CHECK (name IN ('Bank Card', 'QR Code'))
 );
 
--- Create Payment table (stores payment history linked to Booking)
+-- Create Payment table with conditional billing address requirement
 CREATE TABLE Payment (
     id SERIAL PRIMARY KEY,
     person_id INT NOT NULL,
     booking_id INT NOT NULL UNIQUE, -- Links payment to a specific booking
     amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
     payment_method_id INT NOT NULL, -- Foreign key linking to PaymentMethod
+    payment_details BYTEA NOT NULL, -- Encrypted field for storing card/email details
+    billing_address VARCHAR(255), -- Nullable for QR payments
+    billing_postal_code VARCHAR(10) CHECK (billing_postal_code ~ '^[A-Za-z0-9 -]+$'), -- Nullable for QR payments
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
     FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE,
     FOREIGN KEY (booking_id) REFERENCES Booking(id) ON DELETE CASCADE,
-    FOREIGN KEY (payment_method_id) REFERENCES PaymentMethod(id) ON DELETE CASCADE
+    FOREIGN KEY (payment_method_id) REFERENCES PaymentMethod(id) ON DELETE CASCADE,
+    
+    -- Enforce billing details for card payments
+    CONSTRAINT chk_billing_required CHECK (
+        (payment_method_id = 1 AND billing_address IS NOT NULL AND billing_postal_code IS NOT NULL)
+        OR payment_method_id = 2
+    )
 );
+
+
 
 -- Create SavedCards table (stores user bank cards securely for future payments)
 CREATE TABLE SavedCards (

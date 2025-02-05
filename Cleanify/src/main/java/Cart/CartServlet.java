@@ -63,7 +63,6 @@ public class CartServlet extends HttpServlet {
                 if (!booking.containsKey(serviceId)) {
                     booking.put(serviceId, 1);
                     cart.put(serviceId, 1);
-                    setSessionMessage(request, "Leading to collect booking details...", "info");
                     response.sendRedirect(request.getContextPath() + "/views/member/cart/index.jsp"); 
                 } else {
                     setSessionMessage(request, "This service has already been added, but the user details are still pending", "info");

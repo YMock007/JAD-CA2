@@ -192,7 +192,7 @@ button.btn {
 		                <form action="${pageContext.request.contextPath}/serviceServlet" method="GET" id="cart-container">
 		                    <input type="hidden" name="service_id" value="<%= saved.getServiceId() %>" />
 		                    <button class="card-item-submit-Btn" type="submit" class="btn btn-secondar">
-			                    <img src="<%= request.getContextPath() + '/' + saved.getServiceImageUrl() %>" 
+			                    <img src="<%= saved.getServiceImageUrl() %>" 
 	                         		alt="<%= saved.getServiceName() %>" class="img-fluid rounded">
 				                <div class="card-body">
 				                    <p class="serviceName">Service name: <%= saved.getServiceName() %></p>
