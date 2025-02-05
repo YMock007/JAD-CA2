@@ -9,7 +9,8 @@
         if (basePath == null || basePath.isEmpty()) {
             out.println("Error: BASE_PATH not configured.");
         } else {
-            String scriptPath = basePath + "src/main/webapp/resources/database/initTables.sql";
+            String scriptPath = basePath + "/src/main/webapp/resources/database/initTables.sql";
+            out.println("Resolved script path: " + scriptPath);
             boolean success = InitTables.executeSQLScript(scriptPath);
 
             if (success) {

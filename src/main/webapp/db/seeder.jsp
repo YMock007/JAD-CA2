@@ -10,8 +10,8 @@
         if (basePath == null || basePath.isEmpty()) {
             out.println("Error: BASE_PATH not configured.");
         } else {
-            // Construct the full path for the seed.sql script
-            String scriptPath = basePath + "src/main/webapp/resources/database/seed.sql";
+        	String scriptPath = basePath + "/src/main/webapp/resources/database/seed.sql";
+            out.println("Resolved script path: " + scriptPath);
             boolean success = Seeder.executeSQLScript(scriptPath);
 
             // Display the outcome of the seeding process
