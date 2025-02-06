@@ -4,7 +4,8 @@ INSERT INTO Category (name) VALUES
     ('Repair'), 
     ('Maintenance'),
     ('Pest Control'),
-    ('Installation');
+    ('Installation')
+    ON CONFLICT (name) DO NOTHING;
 
 -- Insert sample roles
 INSERT INTO Role (name) VALUES 
@@ -29,8 +30,34 @@ INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_i
     ('eve_green', 'password111', 'eve@example.com', '1234567891', '404 Cedar St', '567890', 2, FALSE),
     ('frank_brown', 'password222', 'frank@example.com', NULL, '505 Palm St', '678901', 3, FALSE),
     ('grace_blue', 'password333', 'grace@example.com', '6789012345', '606 Fir St', '789012', 1, FALSE),
-    ('hank_gray', 'password444', 'hank@example.com', NULL, '707 Poplar St', '890123', 2, FALSE);
-
+    ('hank_gray', 'password444', 'hank@example.com', NULL, '707 Poplar St', '890123', 2, FALSE),
+    ('mike_cleaner', 'password123', 'mike@example.com', '912345678', '88 Cleaning St', '123123', 3, FALSE),
+    ('sarah_repair', 'password456', 'sarah@example.com', '923456789', '77 Repair Ave', '234234', 3, FALSE),
+    ('tom_hvac', 'password789', 'tom@example.com', '934567890', '66 HVAC Rd', '345345', 3, FALSE),
+    ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '456456', 3, FALSE),
+    ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '567567', 3, FALSE);
+    
+    
+-- Insert sample Worker-Category relationships (Each worker can do multiple categories)
+INSERT INTO WorkerCategory (worker_id, category_id) VALUES 
+    (11, 1), (8, 3), 
+    (12, 2), 
+    (13, 3), (13, 4),
+    (14, 4),
+    (15, 5);  
+    
+    
+    
+-- Insert sample Worker-Service relationships
+INSERT INTO WorkerService (worker_id, service_id) 
+SELECT wc.worker_id, s.id 
+FROM WorkerCategory wc
+JOIN Service s ON wc.category_id = s.category_id;
+    
+    
+    
+   
+-- Insert sample services 
 -- Insert sample services 
 INSERT INTO Service (name, category_id, description, price, image_url, est_duration) VALUES 
     ('Home Cleaning', 1, 'Deep cleaning for residential spaces.', 100.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/homeCleaning.jpg', 2),
@@ -60,3 +87,4 @@ INSERT INTO Booking (requester_id, provider_id, service_id, status_id, date_requ
 INSERT INTO PaymentMethod (name) VALUES 
     ('Bank Card'), 
     ('QR Code');
+

@@ -25,6 +25,11 @@
             margin: 0;
             box-sizing: border-box;
         }
+        
+        body{
+        background: linear-gradient(#eceffe, #ced6fb);
+        min-height: 100vh
+        }
 
         #cartItemsContainer {
         	max-width: 1280px;
@@ -238,6 +243,14 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
             border-radius: 100%;
         }
+        
+        .noItemText {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    text-align: center;
+		}
 
         #inputsUserData {
             max-height: 80vh;
@@ -261,18 +274,16 @@
     <%
 		HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
 		HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
-		
+
 		if (person != null) {
 		    boolean isCartEmpty = (cart == null || cart.isEmpty());
 		    boolean isBookingEmpty = (booking == null || booking.isEmpty());
 		
 		    if (isCartEmpty && isBookingEmpty) {
 		%>
-		    <div class="container-fluid">
-		        <div id="emptyCartMessage" class="text-center">
-		            <p>No service in the cart</p>
-		        </div>
-		    </div>
+		    <div class="noItemText">
+			        <span>Your cart is empty!</span>
+			 </div>
 		<%
 		    } else {
 		%>
