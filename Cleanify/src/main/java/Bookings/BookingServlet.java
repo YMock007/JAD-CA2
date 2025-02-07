@@ -8,10 +8,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.sql.Date;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @WebServlet("/BookingServlet")
 public class BookingServlet extends HttpServlet {
@@ -19,7 +24,6 @@ public class BookingServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // ✅ Retrieve & Validate Payment Details
             String paymentIntentId = request.getParameter("paymentIntentId");
             if (paymentIntentId == null || paymentIntentId.isEmpty()) {
                 setSessionMessage(request, "Payment verification failed. Try again.", "error");
@@ -27,8 +31,6 @@ public class BookingServlet extends HttpServlet {
                 return;
             }
             byte[] paymentDetails = paymentIntentId.getBytes(StandardCharsets.UTF_8);
-
-            // ✅ Retrieve & Validate Booking Details
             int memberId = Integer.parseInt(request.getParameter("memberId").trim());
             String phoneNumber = request.getParameter("phoneNumber").trim();
             String address = request.getParameter("address").trim();
@@ -39,44 +41,30 @@ public class BookingServlet extends HttpServlet {
             String billingAddress = request.getParameter("billingAddress");
             String billingPostalCode = request.getParameter("billingPostalCode");
 
-            billingAddress = (billingAddress != null) ? billingAddress.trim() : "";
-            billingPostalCode = (billingPostalCode != null) ? billingPostalCode.trim() : "";
-
+            billingAddress = (billingAddress != null && !billingAddress.equals("")) ? billingAddress.trim() : "";
+            billingPostalCode = (billingPostalCode != null && !billingPostalCode.equals("")) ? billingPostalCode.trim() : "";
             String bookingCartStr = request.getParameter("bookingCart");
-
-            // ✅ Parse Date
             Date dateRequested = Date.valueOf(appointmentDateStr);
-
-            // ✅ Parse Time
             Time timeRequested = (appointmentTimeStr != null && !appointmentTimeStr.isEmpty()) ?
-                Time.valueOf(appointmentTimeStr + ":00") : Time.valueOf("00:00:00");
-
-            // ✅ Retrieve & Validate Payment Information
+                    Time.valueOf(appointmentTimeStr + ":00") : Time.valueOf("00:00:00");
             double amount = Double.parseDouble(request.getParameter("amount"));
             int paymentMethodId = Integer.parseInt(request.getParameter("paymentMethodId"));
-
-            // ✅ Booking Status
             int statusId = 1;
-
-            // ✅ Extract Service IDs from bookingCartStr
             List<Integer> serviceIds = extractServiceIds(bookingCartStr);
 
-            // ✅ If no services found, return error
             if (serviceIds.isEmpty()) {
                 setSessionMessage(request, "No services selected for booking.", "error");
                 response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
                 return;
             }
 
-            // ✅ Call Function to Process Booking
             boolean success = BookingList.createBookingWithPayment(
-                 memberId, serviceIds, statusId, dateRequested, timeRequested, phoneNumber,
-                 address, postalCode, specialRequest, amount, paymentMethodId, paymentDetails,
-                 (paymentMethodId == 1) ? billingAddress : null,
-                 (paymentMethodId == 1) ? billingPostalCode : null
+                    memberId, serviceIds, statusId, dateRequested, timeRequested, phoneNumber,
+                    address, postalCode, specialRequest, amount, paymentMethodId, paymentDetails,
+                    (paymentMethodId == 1) ? billingAddress : null,
+                    (paymentMethodId == 1) ? billingPostalCode : null
             );
 
-            // ✅ Handle Booking Success or Failure
             if (success) {
                 setSessionMessage(request, "Booking successfully created.", "success");
                 response.sendRedirect(request.getContextPath() + "/views/member/booking/index.jsp");
@@ -86,29 +74,42 @@ public class BookingServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
+            System.out.println("ERROR: NumberFormatException - " + e.getMessage());
             setSessionMessage(request, "Invalid number format: " + e.getMessage(), "error");
             response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
         } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: IllegalArgumentException - " + e.getMessage());
             setSessionMessage(request, "Invalid date format. Please use YYYY-MM-DD.", "error");
             response.sendRedirect(request.getContextPath() + "/views/member/booking/booking.jsp");
         } catch (Exception e) {
+            System.out.println("ERROR: General Exception - " + e.getMessage());
+            e.printStackTrace();
             setSessionMessage(request, "Error processing booking: " + e.getMessage(), "error");
             response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
         }
     }
 
-    // ✅ Extracts Service IDs from bookingCartStr
+
     private List<Integer> extractServiceIds(String bookingCartStr) {
         List<Integer> serviceIds = new ArrayList<>();
-        if (bookingCartStr != null && !bookingCartStr.isEmpty()) {
-            for (String serviceId : bookingCartStr.split(",")) {
-                serviceIds.add(Integer.parseInt(serviceId.trim()));
+        
+        if (bookingCartStr != null && !bookingCartStr.trim().isEmpty()) {
+            try {
+                if (bookingCartStr.startsWith("[") && bookingCartStr.endsWith("]")) {
+                    Type listType = new TypeToken<List<Integer>>() {}.getType();
+                    serviceIds = new Gson().fromJson(bookingCartStr, listType);
+                } else {
+                    serviceIds = Arrays.stream(bookingCartStr.split(","))
+                                       .map(Integer::parseInt)
+                                       .collect(Collectors.toList());
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: Failed to parse bookingCartStr - " + e.getMessage());
             }
         }
         return serviceIds;
     }
 
-    // ✅ Helper Function to Set Session Messages
     private void setSessionMessage(HttpServletRequest request, String message, String status) {
         HttpSession session = request.getSession();
         session.setAttribute("message", message);

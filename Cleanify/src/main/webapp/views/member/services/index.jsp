@@ -22,7 +22,9 @@
 </head>
 <style>
 body{
-        background: linear-gradient(#eceffe, #ced6fb);}
+        background: linear-gradient(#eceffe, #ced6fb);
+        position: relative;
+        }
 </style>
 
 <body>

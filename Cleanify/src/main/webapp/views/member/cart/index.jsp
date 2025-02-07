@@ -39,7 +39,7 @@
             color: #000;
             padding: 20px;
             position: relative;
-            border: 2px solid black;
+            border: 2px solid var(--text-teal);
             border-radius: 5px;
         }
         
@@ -76,8 +76,8 @@
             justify-content: flex-start;
             padding: 0 1.4rem 1.4rem;
             overflow-y : auto;
-            border-top: 2px solid black;
-            border-bottom: 2px solid black;
+            border-top: 2px solid var(--text-teal);
+            border-bottom: 2px solid var(--text-teal);
             padding: 10px 5px;
         }
 
@@ -209,7 +209,7 @@
             font-style: normal;
             border-radius: 5px;
             width: 100%;
-            border: 1px solid #3ac162;
+            border: 1px solid var(--text-teal);
             margin-bottom: 10px;
             box-sizing: border-box;
         }
@@ -269,7 +269,6 @@
 </head>
 <body>
     <%@ include file="/views/Util/components/header/header.jsp" %>
-    <%@ include file="/views/Util/notification.jsp" %>
 
     <%
 		HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
@@ -335,7 +334,9 @@
 		                            </form>
 		                        </div>
 		                        <%
-		                        totalPriceForCart += service.getPrice();
+		                        if(booking.containsKey(service.getId())){
+		                        	totalPriceForCart += service.getPrice();
+		                        }
 		                        
 		                        }
 		                    }
@@ -366,7 +367,7 @@
 		}
 		%>
 
-
+        <%@ include file="/views/Util/notification.jsp" %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="<%= request.getContextPath() %>/views/member/cart/validate.js" type="text/javascript"></script>
     <script>

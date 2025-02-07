@@ -20,10 +20,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -39,6 +42,8 @@ import javax.imageio.ImageIO;
 
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -62,7 +67,7 @@ public class SendEmailServlet extends HttpServlet {
 
         try {
             String email = request.getParameter("email");
-            String amountStr = request.getParameter("amount");
+            String amountStr = request.getParameter("totalPrice");
             String memberId = request.getParameter("memberId").trim();
             String phoneNumber = request.getParameter("phoneNumber").trim();
             String address = request.getParameter("address").trim();
@@ -71,27 +76,35 @@ public class SendEmailServlet extends HttpServlet {
             specialRequest = (specialRequest != null) ? specialRequest.trim() : "";
             String appointmentDate = request.getParameter("appointmentDate").trim();
             String appointmentTime = request.getParameter("appointmentTime").trim();
-            String billingAddress = null;
-            String billingPostalCode = null;
+            String billingAddress = "";
+            String billingPostalCode = "";
             String bookingCartStr = request.getParameter("bookingCart");
-            
-            List<Integer> serviceIds = extractServiceIds(bookingCartStr);
-            
-            long amount;
+
+            List<Integer> serviceIds = new ArrayList<>();
+            if (bookingCartStr != null && !bookingCartStr.trim().isEmpty()) {
+                try {
+                    Type listType = new TypeToken<List<Integer>>() {}.getType();
+                    serviceIds = new Gson().fromJson(bookingCartStr, listType);
+                } catch (Exception e) {
+                    System.out.println("ERROR: Failed to parse serviceIdsJson - " + e.getMessage());
+                }
+            }
+
+            long amount = 0;
             try {
                 amount = (long) (Double.parseDouble(amountStr)); 
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid amount format. Amount must be a valid number.");
+            	setSessionMessage(request, "Invalid amount format. Amount must be a valid number.", "error");
             }
             if (email == null || email.isEmpty()) {
-                response.getWriter().print("{\"success\": false, \"message\": \"Email address is required.\"}");
+                setSessionMessage(request, "{\"success\": false, \"message\": \"Email address is required.\"}", "error");
                 return;
             }
 
             String qrData = "🔹 Cleanify - Payment Confirmation 🔹\n"
                           + "---------------------------------\n"
                           + "✅ Payment Received Successfully!\n"
-                          + "💳 Amount Paid: S$" + (amount * 0.01) + "\n"
+                          + "💳 Amount Paid: S$" + amountStr + "\n"
                           + "📌 Payment Method: QR Code Payment\n\n"
                           + "📅 Service Date: " + appointmentDate + "\n"
                           + "⏰ Service Time: " + appointmentTime + "\n\n"
@@ -99,15 +112,14 @@ public class SendEmailServlet extends HttpServlet {
                           + "🚀 We are assigning a professional cleaner to your booking.\n"
                           + "📢 You will receive an update with cleaner details soon!\n\n"
                           + "🙏 Thank you for choosing **Cleanify**!\n"
-                          + "✨ We look forward to making your space shine.\n\n"
-                          + "📞 Need help? Contact us: +65 1234 5678\n";
+                          + "✨ We look forward to making your space shine.\n\n";
 
             BufferedImage qrImage = generateQRCodeImage(qrData);
             
             String messageBody = "Dear Customer,\n\n"
                     + "Thank you for choosing **Cleanify**! Your cleaning service payment request has been received.\n\n"
                     + "💳 **Payment Details:**\n"
-                    + "✔ Amount: S$" + (amount * 0.01) + "\n"
+                    + "✔ Amount: S$" + amountStr + "\n"
                     + "✔ Method: QR Code Payment\n\n"
                     + "📅 **Appointment:**\n"
                     + "✔ Date: " + appointmentDate + "\n"
@@ -126,17 +138,6 @@ public class SendEmailServlet extends HttpServlet {
 
             boolean emailSent = sendEmailWithQR(email, "Your Cleanify Payment Request – Secure Your Appointment!", messageBody, qrImage);
             if (emailSent) {
-                // **Debugging: Print values before processing**
-                System.out.println("DEBUG: Initial billingAddress = " + billingAddress);
-                System.out.println("DEBUG: Initial billingPostalCode = " + billingPostalCode);
-
-                // **Ensure billingAddress and billingPostalCode are not null**
-                billingAddress = (billingAddress != null) ? billingAddress : "";
-                billingPostalCode = (billingPostalCode != null) ? billingPostalCode : "";
-
-                // **Debugging: Print values after null-checking**
-                System.out.println("DEBUG: Final billingAddress = " + billingAddress);
-                System.out.println("DEBUG: Final billingPostalCode = " + billingPostalCode);
 
                 boolean bookingCreated = createBooking(
                         request.getContextPath() + "/BookingServlet", 
@@ -149,19 +150,13 @@ public class SendEmailServlet extends HttpServlet {
                     cleanUpSession(request.getSession(false), serviceIds);
                     
                     setSessionMessage(request, "Booking Confirmed", "success");
-
-                    JSONObject jsonResponse = new JSONObject();
-                    jsonResponse.put("success", true);
-                    jsonResponse.put("status", bookingCreated);
-                    jsonResponse.put("message", "Payment processed. Redirecting to booking...");
-                    jsonResponse.put("redirect_url", request.getContextPath() + "/views/member/booking/index.jsp");
-
-                    out.print(jsonResponse.toString());
+                    response.sendRedirect(request.getContextPath() + "/views/member/booking/index.jsp");
                 } else {
                     setSessionMessage(request, "Booking was not successful.", "error");
+                    response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
+                }
                     throw new Exception("Booking was not successful.");
                 }
-            }
 
 
         } catch (Exception e) {
@@ -178,12 +173,9 @@ public class SendEmailServlet extends HttpServlet {
         return MatrixToImageWriter.toBufferedImage(matrix);
     }
     
-    @SuppressWarnings("unused")
 	private void cleanUpSession(HttpSession session, List<Integer> serviceIds) {
         if (session != null) {
-            @SuppressWarnings("unchecked")
 			HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
-            @SuppressWarnings("unchecked")
 			HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
 
             if (cart != null && booking != null) {
@@ -252,52 +244,25 @@ public class SendEmailServlet extends HttpServlet {
         try {
             String fullUrl = "http://localhost:8080" + bookingUrl;  
             URL url = new URL(fullUrl);
+            System.out.println(url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);
 
-            // **Ensure no parameter is null**
-            memberId = (memberId != null) ? memberId : "";
-            phoneNumber = (phoneNumber != null) ? phoneNumber : "";
-            address = (address != null) ? address : "";
-            postalCode = (postalCode != null) ? postalCode : "";
-            specialRequest = (specialRequest != null) ? specialRequest : "";
-            appointmentDate = (appointmentDate != null) ? appointmentDate : "";
-            appointmentTime = (appointmentTime != null) ? appointmentTime : "";
-            paymentIntentId = (paymentIntentId != null) ? paymentIntentId : "";
-            billingAddress = (billingAddress != null) ? billingAddress : "";
-            billingPostalCode = (billingPostalCode != null) ? billingPostalCode : "";
-            bookingCartStr = (bookingCartStr != null) ? bookingCartStr : "";
-
-            // **Add Debugging Statements**
-            System.out.println("DEBUG: memberId = " + memberId);
-            System.out.println("DEBUG: phoneNumber = " + phoneNumber);
-            System.out.println("DEBUG: address = " + address);
-            System.out.println("DEBUG: postalCode = " + postalCode);
-            System.out.println("DEBUG: specialRequest = " + specialRequest);
-            System.out.println("DEBUG: appointmentDate = " + appointmentDate);
-            System.out.println("DEBUG: appointmentTime = " + appointmentTime);
-            System.out.println("DEBUG: paymentIntentId = " + paymentIntentId);
-            System.out.println("DEBUG: amount = " + amount);
-            System.out.println("DEBUG: billingAddress = " + billingAddress);
-            System.out.println("DEBUG: billingPostalCode = " + billingPostalCode);
-            System.out.println("DEBUG: bookingCartStr = " + bookingCartStr);
-
-            // **Ensure encoding will not fail**
-            String postData = "memberId=" + URLEncoder.encode(memberId, StandardCharsets.UTF_8.name()) +
-                    "&phoneNumber=" + URLEncoder.encode(phoneNumber, StandardCharsets.UTF_8.name()) +
-                    "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8.name()) +
-                    "&postalCode=" + URLEncoder.encode(postalCode, StandardCharsets.UTF_8.name()) +
-                    "&specialRequest=" + URLEncoder.encode(specialRequest, StandardCharsets.UTF_8.name()) +
-                    "&appointmentDate=" + URLEncoder.encode(appointmentDate, StandardCharsets.UTF_8.name()) +
-                    "&appointmentTime=" + URLEncoder.encode(appointmentTime, StandardCharsets.UTF_8.name()) +
-                    "&paymentIntentId=" + URLEncoder.encode(paymentIntentId, StandardCharsets.UTF_8.name()) +
+            String postData = "memberId=" + URLEncoder.encode(memberId, "UTF-8") +
+                    "&phoneNumber=" + URLEncoder.encode(phoneNumber, "UTF-8") +
+                    "&address=" + URLEncoder.encode(address, "UTF-8") +
+                    "&postalCode=" + URLEncoder.encode(postalCode, "UTF-8") +
+                    "&specialRequest=" + URLEncoder.encode(specialRequest, "UTF-8") +
+                    "&appointmentDate=" + URLEncoder.encode(appointmentDate, "UTF-8") +
+                    "&appointmentTime=" + URLEncoder.encode(appointmentTime, "UTF-8") +
+                    "&paymentIntentId=" + URLEncoder.encode(paymentIntentId, "UTF-8") +
                     "&amount=" + amount +
                     "&paymentMethodId=2" + 
-                    "&billingAddress=" + URLEncoder.encode(billingAddress, StandardCharsets.UTF_8.name()) +
-                    "&billingPostalCode=" + URLEncoder.encode(billingPostalCode, StandardCharsets.UTF_8.name()) + 
-                    "&bookingCart=" + URLEncoder.encode(bookingCartStr, StandardCharsets.UTF_8.name());
+                    "&billingAddress=" + URLEncoder.encode(billingAddress, "UTF-8") +
+                    "&billingPostalCode=" + URLEncoder.encode(billingPostalCode, "UTF-8") + 
+                    "&bookingCart=" + URLEncoder.encode(bookingCartStr, "UTF-8");
 
             byte[] postDataBytes = postData.getBytes(StandardCharsets.UTF_8);
             OutputStream os = conn.getOutputStream();
@@ -313,6 +278,7 @@ public class SendEmailServlet extends HttpServlet {
             return false;
         }
     }
+
 
     
     private List<Integer> extractServiceIds(String bookingCartStr) {

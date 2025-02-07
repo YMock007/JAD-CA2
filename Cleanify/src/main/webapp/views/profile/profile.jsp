@@ -11,8 +11,212 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Profile with Overlay</title>
-    <link rel="stylesheet" href="profile.css">
 </head>
+<style>
+
+    :root {
+        --bg-primary: #474747;
+        --bg-secondary: #17a2b8;
+        --text-white: #ffffff;
+        --text-blue: #007bff;
+        --text-teal: #17a2b8;
+        --input-bg: #f9f9f9;
+        --input-border: #ccc;
+        --button-hover: #45a049;
+    }
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.overlay-container {
+    display: flex;
+    width: 1280px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-top: 30px;
+    height: 80vh;
+}
+
+.sidebar {
+    width: 25%;
+    color: #000;
+    padding: 20px;
+    border: 5px solid var(--text-teal);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+}
+
+.sidebar ul li {
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background: var(--text-teal);
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+    background: rgb(23,170,193);
+	background: linear-gradient(113deg, rgba(23,170,193,1) 0%, rgba(146,192,207,1) 84%);
+}
+
+.form-container {
+    width: 100%;
+    padding: 40px;
+    background: #fff;
+    overflow-y: auto;
+    border: 5px solid var(--text-teal);
+    border-left: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.tab-content {
+    display: none;
+    gap: 10px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 100%  
+}   
+
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+input:focus {
+    border-color: #0077B6;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+input {
+    width: 50%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box; 
+    margin-bottom: 5px;
+}
+
+input:focus {
+    border-color: #0077B6;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+button.btn {
+    width: auto;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button.btn-primary {
+    background-color: var(--text-teal);
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-primary:hover {
+    background-color: #005f8c;
+}
+
+button.btn-danger {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-danger:hover {
+    background-color: #b52b2b;
+}
+
+button[disabled] {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+h2.form-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+button#editProfile {
+    margin-top: 20px;
+}
+
+button#updateProfileSection {
+    margin-top: 20px;
+}
+
+
+h2.form-title {
+    font-size: 28px; /* Larger and bold title */
+    margin-bottom: 20px; /* Space below title */
+    color: #333;
+    font-weight: bold;
+}
+
+
+
+
+.toggle-password:hover {
+    color: #0077B6; /* Change color on hover */
+}
+
+
+
+.toggle-password{
+    position: relative;
+    right: 40px;
+}
+
+
+.error-message {
+    color: red; /* Set text color to red */
+    font-size: 12px; /* Adjust font size */
+    margin-top: 5px; /* Add spacing between input and error message */
+    display: block; /* Ensure it takes up its own line */
+}
+
+</style>
 
 <% 
    String successMessage = (String) session.getAttribute("successMessage");

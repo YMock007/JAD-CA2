@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.json.JSONObject;
 
 @WebServlet("/StripePaymentServlet")
@@ -37,34 +36,41 @@ public class StripePaymentServlet extends HttpServlet {
 
         Stripe.apiKey = STRIPE_SECRET_KEY;
 
+        JSONObject jsonResponse = new JSONObject();
+
         try {
-            String paymentMethodId = request.getParameter("paymentMethodId").trim();
+            // ✅ Retrieve and validate parameters
+            String paymentMethodId = request.getParameter("paymentMethodId");
             String amountStr = request.getParameter("amount");
-            String memberId = request.getParameter("memberId").trim();
-            String phoneNumber = request.getParameter("phoneNumber").trim();
-            String address = request.getParameter("address").trim();
-            String postalCode = request.getParameter("postalCode").trim();
+            String memberId = request.getParameter("memberId");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
+            String postalCode = request.getParameter("postalCode");
             String specialRequest = request.getParameter("specialRequest");
-            specialRequest = (specialRequest != null) ? specialRequest.trim() : "";
-            String appointmentDate = request.getParameter("appointmentDate").trim();
-            String appointmentTime = request.getParameter("appointmentTime").trim();
-            String billingAddress = request.getParameter("billingAddress").trim();
-            String billingPostalCode = request.getParameter("billingPostalCode").trim();
+            String appointmentDate = request.getParameter("appointmentDate");
+            String appointmentTime = request.getParameter("appointmentTime");
+            String billingAddress = request.getParameter("billingAddress");
+            String billingPostalCode = request.getParameter("billingPostalCode");
             String bookingCartStr = request.getParameter("bookingCart");
 
-            List<Integer> serviceIds = extractServiceIds(bookingCartStr);
-
-            if (paymentMethodId.isEmpty() || amountStr.isEmpty() || memberId.isEmpty()) {
-                throw new IllegalArgumentException("Invalid payment request: Missing parameters.");
+            if (paymentMethodId == null || amountStr == null || memberId == null || bookingCartStr == null) {
+                throw new IllegalArgumentException("Missing required parameters.");
             }
 
             long amount;
             try {
-                amount = (long) (Double.parseDouble(amountStr)); 
+                amount = (long) (Double.parseDouble(amountStr));
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid amount format. Amount must be a valid number.");
+                throw new IllegalArgumentException("Invalid amount format.");
             }
 
+            // ✅ Convert bookingCartStr into List<Integer>
+            List<Integer> serviceIds = extractServiceIds(bookingCartStr);
+            if (serviceIds.isEmpty()) {
+                throw new IllegalArgumentException("Invalid booking cart data.");
+            }
+
+            // ✅ Create a Payment Intent with Stripe
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
                 .setCurrency("sgd")
@@ -80,94 +86,69 @@ public class StripePaymentServlet extends HttpServlet {
 
             PaymentIntent paymentIntent = PaymentIntent.create(params);
             String paymentStatus = paymentIntent.getStatus();
+
             if (!"succeeded".equals(paymentStatus)) {
-                setSessionMessage(request, "Payment failed: " + paymentStatus, "error");
-                response.sendRedirect(request.getContextPath() + "/views/member/cart/cart.jsp");
+                jsonResponse.put("success", false);
+                jsonResponse.put("error", "Payment failed: " + paymentStatus);
+                out.print(jsonResponse.toString());
                 return;
-            } 
-            setSessionMessage(request, "Payment Successful: " + paymentStatus, "success");
+            }
+
+            // ✅ Create booking after successful payment
             boolean bookingCreated = createBooking(
-                request.getContextPath() + "/BookingServlet", 
-                memberId, phoneNumber, address, postalCode, 
-                specialRequest, appointmentDate, appointmentTime, 
+            	request.getContextPath() + "/BookingServlet",
+                memberId, phoneNumber, address, postalCode,
+                specialRequest, appointmentDate, appointmentTime,
                 paymentIntent.getId(), amount, billingAddress, billingPostalCode, bookingCartStr
             );
 
-            if (bookingCreated) {
-                cleanUpSession(request.getSession(false), serviceIds);
-                
-                setSessionMessage(request, "Booking Confirmed", "success");
-
-                JSONObject jsonResponse = new JSONObject();
-                jsonResponse.put("success", true);
-                jsonResponse.put("paymentIntentId", paymentIntent.getId());
-                jsonResponse.put("status", paymentIntent.getStatus());
-                jsonResponse.put("message", "Payment processed. Redirecting to booking...");
-                jsonResponse.put("redirect_url", request.getContextPath() + "/views/member/booking/index.jsp");
-
+            if (!bookingCreated) {
+                jsonResponse.put("success", false);
+                jsonResponse.put("error", "Booking was not successful.");
                 out.print(jsonResponse.toString());
-            } else {
-                setSessionMessage(request, "Booking was not successful.", "error");
-                throw new Exception("Booking was not successful.");
+                return;
             }
+            cleanUpSession(request.getSession(false), serviceIds);
+            // ✅ Payment & booking successful
+            jsonResponse.put("success", true);
+            jsonResponse.put("paymentIntentId", paymentIntent.getId());
+            jsonResponse.put("message", "Payment processed successfully.");
+            jsonResponse.put("redirect_url", request.getContextPath() + "/views/member/booking/index.jsp");
+            out.print(jsonResponse.toString());
 
         } catch (StripeException e) {
-            setSessionMessage(request, "Stripe Error: " + e.getMessage(), "error");
+            jsonResponse.put("success", false);
+            jsonResponse.put("error", "Stripe Error: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            setSessionMessage(request, "Unexpected error: " + e.getMessage(), "error");
+            jsonResponse.put("success", false);
+            jsonResponse.put("error", "Unexpected error: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             out.flush();
             out.close();
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private boolean createBooking(String bookingUrl, String memberId, String phoneNumber, String address,
-                                  String postalCode, String specialRequest, String appointmentDate, 
-                                  String appointmentTime, String paymentIntentId, long amount, 
-                                  String billingAddress, String billingPostalCode, String bookingCartStr) {
-        try {
-            String fullUrl = "http://localhost:8080" + bookingUrl;  
-            URL url = new URL(fullUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setDoOutput(true);
-
-            String postData = "memberId=" + URLEncoder.encode(memberId, "UTF-8") +
-                    "&phoneNumber=" + URLEncoder.encode(phoneNumber, "UTF-8") +
-                    "&address=" + URLEncoder.encode(address, "UTF-8") +
-                    "&postalCode=" + URLEncoder.encode(postalCode, "UTF-8") +
-                    "&specialRequest=" + URLEncoder.encode(specialRequest, "UTF-8") +
-                    "&appointmentDate=" + URLEncoder.encode(appointmentDate, "UTF-8") +
-                    "&appointmentTime=" + URLEncoder.encode(appointmentTime, "UTF-8") +
-                    "&paymentIntentId=" + URLEncoder.encode(paymentIntentId, "UTF-8") +
-                    "&amount=" + amount +
-                    "&paymentMethodId=1" + 
-                    "&billingAddress=" + URLEncoder.encode(billingAddress, "UTF-8") +
-                    "&billingPostalCode=" + URLEncoder.encode(billingPostalCode, "UTF-8") + 
-                    "&bookingCart=" + URLEncoder.encode(bookingCartStr, "UTF-8");
-
-            byte[] postDataBytes = postData.getBytes(StandardCharsets.UTF_8);
-            OutputStream os = conn.getOutputStream();
-            os.write(postDataBytes);
-            os.flush();
-            os.close();
-
-            int responseCode = conn.getResponseCode();
-            
-            return (responseCode == HttpURLConnection.HTTP_OK);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    // ✅ Extract Service IDs from bookingCartStr
+    private List<Integer> extractServiceIds(String bookingCartStr) {
+        List<Integer> serviceIds = new ArrayList<>();
+        if (bookingCartStr != null && !bookingCartStr.isEmpty()) {
+            try {
+                for (String serviceId : bookingCartStr.split(",")) {
+                    serviceIds.add(Integer.parseInt(serviceId.trim()));
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: Failed to parse bookingCartStr - " + e.getMessage());
+            }
         }
+        return serviceIds;
     }
     
-    @SuppressWarnings("unused")
-	private void cleanUpSession(HttpSession session, List<Integer> serviceIds) {
+    private void cleanUpSession(HttpSession session, List<Integer> serviceIds) {
         if (session != null) {
-            HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
-            HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
+			HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
+			HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
 
             if (cart != null && booking != null) {
                 serviceIds.forEach(serviceId -> {
@@ -178,28 +159,46 @@ public class StripePaymentServlet extends HttpServlet {
         }
     }
 
+    // ✅ Create Booking with Debugging
+    private boolean createBooking(String bookingUrl, String memberId, String phoneNumber, 
+                                  String address, String postalCode, String specialRequest, 
+                                  String appointmentDate, String appointmentTime, 
+                                  String paymentIntentId, long amount, 
+                                  String billingAddress, String billingPostalCode, String bookingCartStr) {
+        try {
+            String fullUrl = "http://localhost:8080" + bookingUrl;
+            URL url = new URL(fullUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
 
-    private void sendErrorResponse(PrintWriter out, String errorMessage) {
-        JSONObject errorResponse = new JSONObject();
-        errorResponse.put("error", errorMessage);
-        out.print(errorResponse.toString());
-    }
-    
-    
-    
-    private List<Integer> extractServiceIds(String bookingCartStr) {
-        List<Integer> serviceIds = new ArrayList<>();
-        if (bookingCartStr != null && !bookingCartStr.isEmpty()) {
-            for (String serviceId : bookingCartStr.split(",")) {
-                serviceIds.add(Integer.parseInt(serviceId.trim()));
-            }
+            String postData = "memberId=" + URLEncoder.encode(memberId, StandardCharsets.UTF_8) +
+                    "&phoneNumber=" + URLEncoder.encode(phoneNumber, StandardCharsets.UTF_8) +
+                    "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8) +
+                    "&postalCode=" + URLEncoder.encode(postalCode, StandardCharsets.UTF_8) +
+                    "&specialRequest=" + URLEncoder.encode(specialRequest, StandardCharsets.UTF_8) +
+                    "&appointmentDate=" + URLEncoder.encode(appointmentDate, StandardCharsets.UTF_8) +
+                    "&appointmentTime=" + URLEncoder.encode(appointmentTime, StandardCharsets.UTF_8) +
+                    "&paymentIntentId=" + URLEncoder.encode(paymentIntentId, StandardCharsets.UTF_8) +
+                    "&amount=" + amount +
+                    "&paymentMethodId=1" + 
+                    "&billingAddress=" + URLEncoder.encode(billingAddress, StandardCharsets.UTF_8) +
+                    "&billingPostalCode=" + URLEncoder.encode(billingPostalCode, StandardCharsets.UTF_8) +
+                    "&bookingCart=" + URLEncoder.encode(bookingCartStr, StandardCharsets.UTF_8);
+
+            OutputStream os = conn.getOutputStream();
+            os.write(postData.getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("DEBUG: Booking Servlet Response Code = " + responseCode);
+
+            return (responseCode == HttpURLConnection.HTTP_OK);
+        } catch (IOException e) {
+            System.out.println("ERROR: Booking request failed - " + e.getMessage());
+            return false;
         }
-        return serviceIds;
-    }
-    
-    private void setSessionMessage(HttpServletRequest request, String message, String status) {
-        HttpSession session = request.getSession();
-        session.setAttribute("message", message);
-        session.setAttribute("status", status);
     }
 }

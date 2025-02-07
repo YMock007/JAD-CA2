@@ -93,6 +93,7 @@ public class CartServlet extends HttpServlet {
             } else if ("remove".equals(action)) {
                 if (cart.containsKey(serviceId)) {
                     cart.remove(serviceId);
+                    booking.remove(serviceId);
                     setSessionMessage(request, "Service removed from cart", "success");
                 } else {
                     setSessionMessage(request, "Service not found in cart", "error");

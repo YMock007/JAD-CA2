@@ -1,7 +1,8 @@
 <%@ include file="/views/Util/auth/memberAuth.jsp" %>
+<%@ page import="com.google.gson.Gson" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Map, java.util.stream.Collectors" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="Services.Service, Services.ServiceList, Persons.Person, Persons.PersonList, java.util.*" %>
@@ -11,7 +12,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cleanify</title>
-    <script src="https://kit.fontawesome.com/015a0a8305.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
     <style>
@@ -37,11 +37,14 @@
         max-width: 1280px;
         height: 80vh;
         margin: auto;
-        display: grid;
+        margin-top: 30px;
+    }
+    
+    #bookingForm{
+    display: grid;
         grid-template-columns: 1fr 1fr;
         justify-content: center;
         gap: 20px;
-        margin-top: 30px;
     }
 
 
@@ -195,8 +198,18 @@
 	float bookingPrice = (Float) session.getAttribute("totalPrice");
     float gst = (float) (bookingPrice * 0.09) ;
     float totalPrice = bookingPrice + gst ;
+
     HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
 
+    // Extract service IDs (keys) into a List<Integer>
+    List<Integer> serviceIds = new ArrayList<>();
+    if (booking != null) {
+        serviceIds.addAll(booking.keySet()); // Extract keys
+    }
+
+    // Convert Java List to JSON Array
+    String serviceIdsJson = new Gson().toJson(serviceIds);
+ 
     // ✅ Convert booking cart to JSON
     JSONObject jsonBooking = new JSONObject();
     if (booking != null) {
@@ -204,138 +217,141 @@
             jsonBooking.put(String.valueOf(entry.getKey()), entry.getValue());
         }
     }
+    
+    
 	%>
 
-	<input type="hidden" id="totalPrice" value="<%= totalPrice%>"> 
 	<input type="hidden" id="contextPath" value="${pageContext.request.contextPath}"> 
 
 
 		<div class="container-fluid row" id="container">
-		    <div class="personalInfo col-sm-12">
-		        <form id="bookingForm" action="${pageContext.request.contextPath}/BookingServlet" method="post">
-		            <input type="hidden" id="memberId" name="memberId" value="<%= person.getId() %>">
-		
-		            <h1>Booking Form</h1>
-		
-		            <!-- Phone Number -->
-		            <div class="form-group">
-		                <label for="phoneNumber">Phone Number</label>
-		                <input type="tel" id="phoneNumber" name="phoneNumber" pattern="\d{8}" required>
-		            </div>
-		
-		            <!-- Address -->
-		            <div class="form-group">
-		                <label for="address">Address</label>
-		                <input type="text" id="address" name="address" required>
-		            </div>
-		
-		            <!-- Postal Code -->
-		            <div class="form-group">
-		                <label for="postalCode">Postal Code</label>
-		                <input type="text" id="postalCode" name="postalCode" pattern="\d{6}" required>
-		            </div>
-		
-		            <!-- Appointment Date -->
-		            <div class="form-group">
-		                <label for="appointmentDate">Appointment Date</label>
-		                <input type="date" id="appointmentDate" name="appointmentDate" required>
-		            </div>
-		
-		            <!-- Appointment Time -->
-		            <div class="form-group">
-		                <label for="appointmentTime">Appointment Time</label>
-		                <select id="appointmentTime" name="appointmentTime" required>
-		                    <option value="" selected disabled>Select a time</option>
-		                    <% 
-		                        int startHour = 8;
-		                        int interval = 3;
-		                        int endHour = 18;
-		                        for (int hour = startHour; hour <= endHour; hour += interval) {
-		                            String timeValue = String.format("%02d:00", hour); 
-		                            String displayTime = (hour > 12 ? (hour - 12) : hour) + ":00 " + (hour >= 12 ? "PM" : "AM");
-		                    %>
-		                        <option value="<%= timeValue %>"><%= displayTime %></option>
-		                    <% } %>
-		                </select>
-		            </div>
-		
-		            <!-- Special Request -->
-		            <div class="form-group">
-		                <label for="specialRequest">Special Request</label>
-		                <textarea id="specialRequest" name="specialRequest"></textarea>
-		            </div>
-		        </form>
-		    </div>
-		
-		    <div class="paymentInfo col-sm-12">
-		    	<div class="priceSummary">
-				    <div class="summaryRow">
-				        <span class="label">Number of Services:</span>
-				        <span class="value"><%= booking.size() %></span>
-				    </div>
-				    <div class="summaryRow">
-				        <span class="label">Service Price:</span>
-				        <span class="value">S$<%= bookingPrice %></span>
-				    </div>
-				    <div class="summaryRow">
-				        <span class="label">GST (9%):</span>
-				        <span class="value">S$<%= gst %></span>
-				    </div>
-				    
-				    <div class="summaryRow totalRow">
-				        <span class="label">Total Amount:</span>
-				        <span class="value">S$<%= totalPrice %></span>
-				    </div>
-				</div>
-		    		            
-		        <div class="tab-buttons">
-		            <button class="tab-button active" onclick="switchTab('credit-card')">Bank Card</button>
-		            <button class="tab-button" onclick="switchTab('qr-transfer')">Transfer It Now</button>
-		        </div>
-		
-		        <!-- Credit Card Payment -->
-		        <div id="credit-card" class="tab-content active">
-		            <h4>Billing Address</h4>
-		            <div class="form-group">
-		                <label for="billingAddress">Street Address</label>
-		                <input type="text" id="billingAddress" name="billingAddress" required>
-		            </div>
-		            <div class="form-group">
-		                <label for="city">City</label>
-		                <input type="text" id="billingCity" name="city" required>
-		            </div>
-		            <div class="form-group">
-		                <label for="postalCode">Postal Code</label>
-		                <input type="text" id="billingPostalCode" name="postalCode" required>
-		            </div>
-		
-		            <h4>Payment Information</h4>
-		            <div id="card-element" class="form-group"></div>
-		            <div id="card-errors" style="color: red; margin-top: 10px;"></div>
+	    <form id="bookingForm" action="${pageContext.request.contextPath}/SendEmailServlet" method="post">
+	        <div class="personalInfo col-sm-12">
+	            <input type="hidden" id="memberId" name="memberId" value="<%= person.getId() %>">
+	
+	            <h1>Booking Form</h1>
+	
+	            <!-- Phone Number -->
+	            <div class="form-group">
+	                <label for="phoneNumber">Phone Number</label>
+	                <input type="tel" id="phoneNumber" name="phoneNumber" pattern="\d{8}" required>
+	            </div>
+	
+	            <!-- Address -->
+	            <div class="form-group">
+	                <label for="address">Address</label>
+	                <input type="text" id="address" name="address" required>
+	            </div>
+	
+	            <!-- Postal Code -->
+	            <div class="form-group">
+	                <label for="postalCode">Postal Code</label>
+	                <input type="text" id="postalCode" name="postalCode" pattern="\d{6}" required>
+	            </div>
+	
+	            <!-- Appointment Date -->
+	            <div class="form-group">
+	                <label for="appointmentDate">Appointment Date</label>
+	                <input type="date" id="appointmentDate" name="appointmentDate" required>
+	            </div>
+	
+	            <!-- Appointment Time -->
+	            <div class="form-group">
+	                <label for="appointmentTime">Appointment Time</label>
+	                <select id="appointmentTime" name="appointmentTime" required>
+	                    <option value="" selected disabled>Select a time</option>
+	                    <% 
+	                        int startHour = 8;
+	                        int interval = 3;
+	                        int endHour = 18;
+	                        for (int hour = startHour; hour <= endHour; hour += interval) {
+	                            String timeValue = String.format("%02d:00", hour); 
+	                            String displayTime = (hour > 12 ? (hour - 12) : hour) + ":00 " + (hour >= 12 ? "PM" : "AM");
+	                    %>
+	                    <option value="<%= timeValue %>"><%= displayTime %></option>
+	                    <% } %>
+	                </select>
+	            </div>
+	
+	            <!-- Special Request -->
+	            <div class="form-group">
+	                <label for="specialRequest">Special Request</label>
+	                <textarea id="specialRequest" name="specialRequest"></textarea>
+	            </div>
+	        </div>
+	
+	        <div class="paymentInfo col-sm-12">
+	            <div class="priceSummary">
+	                <div class="summaryRow">
+	                    <span class="label">Number of Services:</span>
+	                    <span class="value"><%= booking.size() %></span>
+	                </div>
+	                <div class="summaryRow">
+	                    <span class="label">Service Price:</span>
+	                    <span class="value">S$<%= bookingPrice %></span>
+	                </div>
+	                <div class="summaryRow">
+	                    <span class="label">GST (9%):</span>
+	                    <span class="value">S$<%= gst %></span>
+	                </div>
+	
+	                <div class="summaryRow totalRow">
+	                    <span class="label">Total Amount:</span>
+	                    <span class="value">S$<%= totalPrice %></span>
+	                </div>
+	            </div>
+	
+	            <div class="tab-buttons">
+	                <button type="button" class="tab-button active" onclick="switchTab('credit-card')">Bank Card</button>
+	                <button type="button" class="tab-button" onclick="switchTab('qr-transfer')">Transfer It Now</button>
+	            </div>
+	
+	            <!-- Credit Card Payment -->
+	            <div id="credit-card" class="tab-content active">
+	                <h4>Billing Address</h4>
+	                <div class="form-group">
+	                    <label for="billingAddress">Street Address</label>
+	                    <input type="text" id="billingAddress" name="billingAddress" value = " " required>
+	                </div>
+	                <div class="form-group">
+	                    <label for="billingCity">City</label>
+	                    <input type="text" id="billingCity" name="billingCity"  value = " " required>
+	                </div>
+	                <div  class="form-group">
+	                    <label for="billingPostalCode">Postal Code</label>
+	                    <input type="text" id="billingPostalCode" name="billingPostalCode"  value = " " required>
+	                </div>
+	
+	                <h4>Payment Information</h4>
+	                <div id="card-element"></div>
+	                <div id="card-errors" style="color: red; margin-top: 10px;"></div>
+	
+	                <button id="submit-payment" class="payment-button" disabled>Pay</button>
+	            </div>
+	
+	            <!-- QR Code Payment -->
+	            <div id="qr-transfer" class="tab-content">
+	                <h6>Receive QR Code via Email</h6>
+	                <div class="form-group">
+	                    <label for="userEmail">Email Address</label>
+	                    <input type="email" id="userEmail" name="email" required>
+	                    <div class="useMyEmail">
+	                        <input type="checkbox" id="useMyEmail" onchange="fillEmail()">
+	                        <label for="useMyEmail">Use my registered email</label>
+	                    </div>
+	                </div>
+	                <button id="sendQrButton" type="submit" class="payment-button-email">Send QR Code to Email</button>
+	                <input type="hidden" id="totalPrice" name="totalPrice" value="<%= totalPrice%>">
+	                <input type="hidden" id="totalPrice" name="bookingCart" value="<%= serviceIdsJson%>">
 
+	            </div>
+	        </div>
+	    </form>
+	</div>
 		
-		            <button id="submit-payment" class="payment-button" disabled>Pay</button>
-		        </div>
-		
-		        <!-- QR Code Payment -->
-		        <div id="qr-transfer" class="tab-content">
-		            <h6>Receive QR Code via Email</h6>
-		            <div class="form-group">
-		                <label for="userEmail">Email Address</label>
-		                <input type="email" id="userEmail" name="userEmail" required>
-		                <div class="useMyEmail">
-		                    <input type="checkbox" id="useMyEmail" onchange="fillEmail()">
-		                    <label for="useMyEmail">Use my registered email</label>
-		                </div>
-		            </div>
-		            <button id="sendQrButton" type="submit" class="payment-button-email" disabled>Send QR Code to Email</button>
-		        </div>
-		    </div>
-		</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="<%= request.getContextPath() %>/views/member/checkout/cardPayment.js"></script>
-	<script src="<%= request.getContextPath() %>/views/member/checkout/emailQrCode.js"></script>
 	<script>
 	
 	// Function to switch tabs between payment methods
@@ -385,9 +401,9 @@
     });
     
     
-    var bookingCart = <%= jsonBooking.toString() %>;
+    let bookingCart = <%= jsonBooking.toString() %>;
 
-    var bookingCartArray = Object.keys(bookingCart).map(key => parseInt(key));
+    let bookingCartArray = Object.keys(bookingCart).map(key => parseInt(key));
     </script>
 </body>
 </html>
