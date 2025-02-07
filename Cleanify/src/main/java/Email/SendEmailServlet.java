@@ -17,14 +17,28 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
+
 import javax.imageio.ImageIO;
+
+import org.json.JSONObject;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -41,15 +55,34 @@ public class SendEmailServlet extends HttpServlet {
 	private static final String SENDER_EMAIL = "cleanifymakeyoushine@gmail.com"; 
     private static final String SENDER_PASSWORD = "fgmx nyzu goip asam"; 
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        response.setContentType("application/json");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
         try {
             String email = request.getParameter("email");
             String amountStr = request.getParameter("amount");
-            String appointmentDate = request.getParameter("appointmentDate");
-            String appointmentTime = request.getParameter("appointmentTime");
-            long amount = (long) (Double.parseDouble(amountStr)); 
+            String memberId = request.getParameter("memberId").trim();
+            String phoneNumber = request.getParameter("phoneNumber").trim();
+            String address = request.getParameter("address").trim();
+            String postalCode = request.getParameter("postalCode").trim();
+            String specialRequest = request.getParameter("specialRequest");
+            specialRequest = (specialRequest != null) ? specialRequest.trim() : "";
+            String appointmentDate = request.getParameter("appointmentDate").trim();
+            String appointmentTime = request.getParameter("appointmentTime").trim();
+            String billingAddress = null;
+            String billingPostalCode = null;
+            String bookingCartStr = request.getParameter("bookingCart");
+            
+            List<Integer> serviceIds = extractServiceIds(bookingCartStr);
+            
+            long amount;
+            try {
+                amount = (long) (Double.parseDouble(amountStr)); 
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid amount format. Amount must be a valid number.");
+            }
             if (email == null || email.isEmpty()) {
                 response.getWriter().print("{\"success\": false, \"message\": \"Email address is required.\"}");
                 return;
@@ -92,7 +125,45 @@ public class SendEmailServlet extends HttpServlet {
                     + "✨ **Cleanify – Making Your Space Shine!**";
 
             boolean emailSent = sendEmailWithQR(email, "Your Cleanify Payment Request – Secure Your Appointment!", messageBody, qrImage);
-            response.getWriter().print("{\"success\": " + emailSent + ", \"message\": \"" + (emailSent ? "Email sent successfully." : "Failed to send email.") + "\"}");
+            if (emailSent) {
+                // **Debugging: Print values before processing**
+                System.out.println("DEBUG: Initial billingAddress = " + billingAddress);
+                System.out.println("DEBUG: Initial billingPostalCode = " + billingPostalCode);
+
+                // **Ensure billingAddress and billingPostalCode are not null**
+                billingAddress = (billingAddress != null) ? billingAddress : "";
+                billingPostalCode = (billingPostalCode != null) ? billingPostalCode : "";
+
+                // **Debugging: Print values after null-checking**
+                System.out.println("DEBUG: Final billingAddress = " + billingAddress);
+                System.out.println("DEBUG: Final billingPostalCode = " + billingPostalCode);
+
+                boolean bookingCreated = createBooking(
+                        request.getContextPath() + "/BookingServlet", 
+                        memberId, phoneNumber, address, postalCode, 
+                        specialRequest, appointmentDate, appointmentTime, 
+                        (UUID.randomUUID()).toString(), amount, billingAddress, billingPostalCode, bookingCartStr
+                );
+
+                if (bookingCreated) {
+                    cleanUpSession(request.getSession(false), serviceIds);
+                    
+                    setSessionMessage(request, "Booking Confirmed", "success");
+
+                    JSONObject jsonResponse = new JSONObject();
+                    jsonResponse.put("success", true);
+                    jsonResponse.put("status", bookingCreated);
+                    jsonResponse.put("message", "Payment processed. Redirecting to booking...");
+                    jsonResponse.put("redirect_url", request.getContextPath() + "/views/member/booking/index.jsp");
+
+                    out.print(jsonResponse.toString());
+                } else {
+                    setSessionMessage(request, "Booking was not successful.", "error");
+                    throw new Exception("Booking was not successful.");
+                }
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,6 +176,23 @@ public class SendEmailServlet extends HttpServlet {
 
         BitMatrix matrix = new MultiFormatWriter().encode(data, BarcodeFormat.QR_CODE, width, height, hints);
         return MatrixToImageWriter.toBufferedImage(matrix);
+    }
+    
+    @SuppressWarnings("unused")
+	private void cleanUpSession(HttpSession session, List<Integer> serviceIds) {
+        if (session != null) {
+            @SuppressWarnings("unchecked")
+			HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
+            @SuppressWarnings("unchecked")
+			HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
+
+            if (cart != null && booking != null) {
+                serviceIds.forEach(serviceId -> {
+                    cart.remove(serviceId);
+                    booking.remove(serviceId);
+                });
+            }
+        }
     }
 
     private boolean sendEmailWithQR(String toEmail, String subject, String messageBody, BufferedImage qrImage) {
@@ -154,6 +242,93 @@ public class SendEmailServlet extends HttpServlet {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    @SuppressWarnings("deprecation")
+    private boolean createBooking(String bookingUrl, String memberId, String phoneNumber, String address,
+                                  String postalCode, String specialRequest, String appointmentDate, 
+                                  String appointmentTime, String paymentIntentId, long amount, 
+                                  String billingAddress, String billingPostalCode, String bookingCartStr) {
+        try {
+            String fullUrl = "http://localhost:8080" + bookingUrl;  
+            URL url = new URL(fullUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+
+            // **Ensure no parameter is null**
+            memberId = (memberId != null) ? memberId : "";
+            phoneNumber = (phoneNumber != null) ? phoneNumber : "";
+            address = (address != null) ? address : "";
+            postalCode = (postalCode != null) ? postalCode : "";
+            specialRequest = (specialRequest != null) ? specialRequest : "";
+            appointmentDate = (appointmentDate != null) ? appointmentDate : "";
+            appointmentTime = (appointmentTime != null) ? appointmentTime : "";
+            paymentIntentId = (paymentIntentId != null) ? paymentIntentId : "";
+            billingAddress = (billingAddress != null) ? billingAddress : "";
+            billingPostalCode = (billingPostalCode != null) ? billingPostalCode : "";
+            bookingCartStr = (bookingCartStr != null) ? bookingCartStr : "";
+
+            // **Add Debugging Statements**
+            System.out.println("DEBUG: memberId = " + memberId);
+            System.out.println("DEBUG: phoneNumber = " + phoneNumber);
+            System.out.println("DEBUG: address = " + address);
+            System.out.println("DEBUG: postalCode = " + postalCode);
+            System.out.println("DEBUG: specialRequest = " + specialRequest);
+            System.out.println("DEBUG: appointmentDate = " + appointmentDate);
+            System.out.println("DEBUG: appointmentTime = " + appointmentTime);
+            System.out.println("DEBUG: paymentIntentId = " + paymentIntentId);
+            System.out.println("DEBUG: amount = " + amount);
+            System.out.println("DEBUG: billingAddress = " + billingAddress);
+            System.out.println("DEBUG: billingPostalCode = " + billingPostalCode);
+            System.out.println("DEBUG: bookingCartStr = " + bookingCartStr);
+
+            // **Ensure encoding will not fail**
+            String postData = "memberId=" + URLEncoder.encode(memberId, StandardCharsets.UTF_8.name()) +
+                    "&phoneNumber=" + URLEncoder.encode(phoneNumber, StandardCharsets.UTF_8.name()) +
+                    "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8.name()) +
+                    "&postalCode=" + URLEncoder.encode(postalCode, StandardCharsets.UTF_8.name()) +
+                    "&specialRequest=" + URLEncoder.encode(specialRequest, StandardCharsets.UTF_8.name()) +
+                    "&appointmentDate=" + URLEncoder.encode(appointmentDate, StandardCharsets.UTF_8.name()) +
+                    "&appointmentTime=" + URLEncoder.encode(appointmentTime, StandardCharsets.UTF_8.name()) +
+                    "&paymentIntentId=" + URLEncoder.encode(paymentIntentId, StandardCharsets.UTF_8.name()) +
+                    "&amount=" + amount +
+                    "&paymentMethodId=2" + 
+                    "&billingAddress=" + URLEncoder.encode(billingAddress, StandardCharsets.UTF_8.name()) +
+                    "&billingPostalCode=" + URLEncoder.encode(billingPostalCode, StandardCharsets.UTF_8.name()) + 
+                    "&bookingCart=" + URLEncoder.encode(bookingCartStr, StandardCharsets.UTF_8.name());
+
+            byte[] postDataBytes = postData.getBytes(StandardCharsets.UTF_8);
+            OutputStream os = conn.getOutputStream();
+            os.write(postDataBytes);
+            os.flush();
+            os.close();
+
+            int responseCode = conn.getResponseCode();
+            
+            return (responseCode == HttpURLConnection.HTTP_OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    private List<Integer> extractServiceIds(String bookingCartStr) {
+        List<Integer> serviceIds = new ArrayList<>();
+        if (bookingCartStr != null && !bookingCartStr.isEmpty()) {
+            for (String serviceId : bookingCartStr.split(",")) {
+                serviceIds.add(Integer.parseInt(serviceId.trim()));
+            }
+        }
+        return serviceIds;
+    }
+    
+    private void setSessionMessage(HttpServletRequest request, String message, String status) {
+        HttpSession session = request.getSession();
+        session.setAttribute("message", message);
+        session.setAttribute("status", status);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

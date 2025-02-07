@@ -36,8 +36,12 @@ public class BookingServlet extends HttpServlet {
             String specialRequest = request.getParameter("specialRequest") != null ? request.getParameter("specialRequest").trim() : "";
             String appointmentDateStr = request.getParameter("appointmentDate").trim();
             String appointmentTimeStr = request.getParameter("appointmentTime").trim();
-            String billingAddress = request.getParameter("billingAddress").trim();
-            String billingPostalCode = request.getParameter("billingPostalCode").trim();
+            String billingAddress = request.getParameter("billingAddress");
+            String billingPostalCode = request.getParameter("billingPostalCode");
+
+            billingAddress = (billingAddress != null) ? billingAddress.trim() : "";
+            billingPostalCode = (billingPostalCode != null) ? billingPostalCode.trim() : "";
+
             String bookingCartStr = request.getParameter("bookingCart");
 
             // ✅ Parse Date

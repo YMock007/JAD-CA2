@@ -63,18 +63,20 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
             fetch(contextPath + "/StripePaymentServlet", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `paymentMethodId=${encodeURIComponent(paymentMethodId)}
-                       &amount=${encodeURIComponent(amount)}
-                       &memberId=${encodeURIComponent(memberId)}
-                       &phoneNumber=${encodeURIComponent(phoneNumber)}
-                       &address=${encodeURIComponent(address)}
-                       &postalCode=${encodeURIComponent(postalCode)}
-                       &specialRequest=${encodeURIComponent(specialRequest)}
-                       &appointmentDate=${encodeURIComponent(appointmentDate)}
-                       &appointmentTime=${encodeURIComponent(appointmentTime)}
-                       &billingAddress=${encodeURIComponent(billingFullAddress)}
-                       &billingPostalCode=${encodeURIComponent(billingPostalCode)}
-					   &bookingCart=${encodeURIComponent(bookingCartArray)}`
+				body: `
+				    amount=${encodeURIComponent(amount)}
+				    &memberId=${encodeURIComponent(memberId)}
+				    &phoneNumber=${encodeURIComponent(phoneNumber)}
+				    &address=${encodeURIComponent(address)}
+				    &postalCode=${encodeURIComponent(postalCode)}
+				    &specialRequest=${encodeURIComponent(specialRequest)}
+				    &appointmentDate=${encodeURIComponent(appointmentDate)}
+				    &appointmentTime=${encodeURIComponent(appointmentTime)}
+				    &billingAddress=${encodeURIComponent(billingFullAddress)}
+				    &billingPostalCode=${encodeURIComponent(billingPostalCode)}
+				    &bookingCart=${encodeURIComponent(bookingCartArray)}
+				`
+
             })
             .then(response => response.json())
             .then(result => {

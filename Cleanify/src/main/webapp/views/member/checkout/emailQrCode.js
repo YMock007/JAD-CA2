@@ -16,22 +16,8 @@ document.getElementById('sendQrButton').addEventListener('click', function (even
     var appointmentTime = document.getElementById('appointmentTime').value.trim();
     var amount = document.getElementById('totalPrice').value.trim();
     var email = document.getElementById('userEmail').value.trim();
-
     // Convert amount to cents
     amount = Math.round(parseFloat(amount) * 100);
-
-    // Construct URL-encoded body string
-    var body = new URLSearchParams({
-        amount: amount,
-        memberId: memberId,
-        phoneNumber: phoneNumber,
-        address: address,
-        postalCode: postalCode,
-        specialRequest: specialRequest,
-        appointmentDate: appointmentDate,
-        appointmentTime: appointmentTime,
-        email: email
-    }).toString();
 
     // Send form data to the servlet
     fetch(contextPath + "/SendEmailServlet", {
@@ -39,7 +25,20 @@ document.getElementById('sendQrButton').addEventListener('click', function (even
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: body
+		body: `
+		    amount=${encodeURIComponent(amount)}
+			email=${encodeURIComponent(email)}
+		    &memberId=${encodeURIComponent(memberId)}
+		    &phoneNumber=${encodeURIComponent(phoneNumber)}
+		    &address=${encodeURIComponent(address)}
+		    &postalCode=${encodeURIComponent(postalCode)}
+		    &specialRequest=${encodeURIComponent(specialRequest)}
+		    &appointmentDate=${encodeURIComponent(appointmentDate)}
+		    &appointmentTime=${encodeURIComponent(appointmentTime)}
+		    &billingAddress=${encodeURIComponent(billingFullAddress)}
+		    &billingPostalCode=${encodeURIComponent(billingPostalCode)}
+		    &bookingCart=${encodeURIComponent(bookingCartArray)}
+		`
     })
     .then(response => {
         if (!response.ok) {

@@ -53,7 +53,6 @@ public class StripePaymentServlet extends HttpServlet {
             String bookingCartStr = request.getParameter("bookingCart");
 
             List<Integer> serviceIds = extractServiceIds(bookingCartStr);
-            System.out.println(serviceIds);
 
             if (paymentMethodId.isEmpty() || amountStr.isEmpty() || memberId.isEmpty()) {
                 throw new IllegalArgumentException("Invalid payment request: Missing parameters.");
