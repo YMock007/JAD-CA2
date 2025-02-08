@@ -137,16 +137,27 @@
 	    <form action="${pageContext.request.contextPath}/Inquiry" method="post" id="inquiryForm">
 
 	    <!-- Name Field -->
-	    <div class="form-group">
-	        <label for="name">Name</label>
-	        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-	    </div>
-	
-	    <!-- Email Field -->
-	    <div class="form-group">
-	        <label for="email">Email:</label>
-	        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
-	    </div>
+		<div class="form-group">
+		    
+		    <% if (person != null && person.getName() != null) { %>
+		        <input type="text" id="name" name="name" value="<%= person.getName() %>" hidden=>
+		    <% } else { %>
+		    	<label for="name">Name</label>
+		        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+		    <% } %>
+		</div>
+		
+		<!-- Email Field -->
+		<div class="form-group">
+		    
+		    <% if (person != null && person.getEmail() != null) { %>
+		        <input type="email" id="email" name="email" value="<%= person.getEmail() %>" hidden=>
+		    <% } else { %>
+		    	<label for="email">Email</label>
+		        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+		    <% } %>
+		</div>
+
 	
 	    <!-- Problem Title -->
 	    <div class="form-group">
