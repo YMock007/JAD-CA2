@@ -12,7 +12,7 @@
         body {
     		font-family: Arial, sans-serif;
             background: rgb(20,155,159);
-background: linear-gradient(180deg, rgba(20,155,159,0.9) 20%, rgba(255,255,255,1) 50%, rgba(11,241,203,0.8) 80%);
+			background: linear-gradient(180deg, rgba(20,155,159,0.9) 20%, rgba(255,255,255,1) 50%, rgba(20,155,159,0.6) 80%);
 
             position: relative;
 }
@@ -248,6 +248,7 @@ background: linear-gradient(180deg, rgba(20,155,159,0.9) 20%, rgba(255,255,255,1
 
     <%@ include file="/views/Util/components/swiper/serviceSwiper.jsp" %>
     <%@ include file="/views/Util/notification.jsp" %>
+    <%@ include file="/views/Util/components/inquiry/inquiry.jsp" %>
 	<%@ include file="/views/Util/components/footer/footer.jsp" %>
 </body>
 </html>

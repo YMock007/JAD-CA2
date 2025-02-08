@@ -36,9 +36,26 @@ INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_i
     ('tom_hvac', 'password789', 'tom@example.com', '934567890', '66 HVAC Rd', '345345', 3, FALSE),
     ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '456456', 3, FALSE),
     ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '567567', 3, FALSE);
-    
-    
--- Insert sample Worker-Category relationships (Each worker can do multiple categories)
+
+
+    INSERT INTO Inquiry (email, username, title, description, created_at) VALUES 
+    ('john@example.com', 'John Doe', 'Login Issue', 'I cannot log into my account. Please help.', '2024-02-08 09:30:00'),
+    ('jane@example.com', 'Jane Smith', 'Billing Question', 'I have a question about my recent invoice.', '2024-02-08 10:00:00'),
+    ('alice@example.com', 'Alice Johnson', 'Service Request', 'I need an urgent service appointment.', '2024-02-08 10:30:00'),
+    ('mike@example.com', 'Mike Cleaner', 'Cleaning Schedule', 'Can I reschedule my cleaning service?', '2024-02-08 11:00:00'),
+    ('sarah@example.com', 'Sarah Repair', 'Repair Delay', 'My repair service is delayed. Any updates?', '2024-02-08 11:30:00'),
+    ('tom@example.com', 'Tom HVAC', 'Air Conditioning Issue', 'My AC unit is making a loud noise.', '2024-02-08 12:00:00'),
+    ('linda@example.com', 'Linda Pest', 'Pest Control Request', 'I need a pest control appointment next week.', '2024-02-08 12:30:00'),
+    ('randomuser1@testmail.com', 'David Miller', 'General Inquiry', 'I would like to know more about your services.', '2024-02-08 13:00:00'),
+    ('randomuser2@testmail.com', 'Emma Wilson', 'Price Quote', 'Can you provide a quote for HVAC maintenance?', '2024-02-08 13:30:00'),
+    ('randomuser3@testmail.com', 'Oliver Scott', 'Job Inquiry', 'Are you hiring technicians at the moment?', '2024-02-08 14:00:00'),
+    ('randomuser4@testmail.com', 'Sophia Green', 'Cancellation Policy', 'What is your cancellation policy for services?', '2024-02-08 14:30:00'),
+    ('randomuser5@testmail.com', 'Liam Brown', 'Customer Support', 'I need assistance with a service I booked.', '2024-02-08 15:00:00'),
+    ('randomuser6@testmail.com', 'Noah White', 'Part Replacement', 'Do you sell replacement parts for appliances?', '2024-02-08 15:30:00'),
+    ('randomuser7@testmail.com', 'Ava Thomas', 'Website Issue', 'Your website has a broken link on the services page.', '2024-02-08 16:00:00'),
+    ('randomuser8@testmail.com', 'James Black', 'Membership Question', 'How do I become a member of your service program?', '2024-02-08 16:30:00');
+
+   -- Insert sample Worker-Category relationships (Each worker can do multiple categories)
 INSERT INTO WorkerCategory (worker_id, category_id) VALUES 
     (11, 1), (8, 3), 
     (12, 2), 
@@ -53,11 +70,7 @@ INSERT INTO WorkerService (worker_id, service_id)
 SELECT wc.worker_id, s.id 
 FROM WorkerCategory wc
 JOIN Service s ON wc.category_id = s.category_id;
-    
-    
-    
-   
--- Insert sample services 
+
 -- Insert sample services 
 INSERT INTO Service (name, category_id, description, price, image_url, est_duration) VALUES 
     ('Home Cleaning', 1, 'Deep cleaning for residential spaces.', 100.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/homeCleaning.jpg', 2),
@@ -82,7 +95,18 @@ INSERT INTO Booking (requester_id, provider_id, service_id, status_id, date_requ
     (8, NULL, 6, 1, '2024-12-08', '18:00:00', '8901234567', '606 Fir St', '789012', 'Pool maintenance before holiday season'),
     (9, NULL, 9, 1, '2024-12-09', '19:00:00', '9012345678', '707 Poplar St', '890123', 'Furniture assembly for new apartment'),
     (10, NULL, 1, 1, '2024-12-10', '20:00:00', '0123456789', '808 Willow St', '901234', 'Deep cleaning for move-in');
+    
 
+INSERT INTO Worker (provider_id, name) VALUES
+    (101, 'Michael Cleaner'),
+    (102, 'Sarah Repair'),
+    (103, 'Tom HVAC'),
+    (104, 'Linda Pest'),
+    (105, 'Chris Install');
+
+-- Sample scenario: Update booking when a worker accepts a job
+UPDATE Booking SET provider_id = 101 WHERE id = 1; -- Michael Cleaner accepts job 1
+UPDATE Booking SET provider_id = 102 WHERE id = 2; -- Sarah Repair accepts job 2
 -- Insert sample payment methods (For future use)
 INSERT INTO PaymentMethod (name) VALUES 
     ('Bank Card'), 

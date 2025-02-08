@@ -56,7 +56,7 @@ public class GoogleSigninServlet extends HttpServlet {
             if (person.getRoleId() == 1) {
                 response.sendRedirect("adminDashboard.jsp");
             } else {
-                response.sendRedirect("views/profile/profile.jsp");
+                response.sendRedirect("views/member/home.jsp");
             }
         } catch (Exception e) {
             e.printStackTrace();
