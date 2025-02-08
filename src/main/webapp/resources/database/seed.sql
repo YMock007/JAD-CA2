@@ -37,24 +37,7 @@ INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_i
     ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '456456', 3, FALSE),
     ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '567567', 3, FALSE);
     
-    
--- Insert sample Worker-Category relationships (Each worker can do multiple categories)
-INSERT INTO WorkerCategory (worker_id, category_id) VALUES 
-    (11, 1), (8, 3), 
-    (12, 2), 
-    (13, 3), (13, 4),
-    (14, 4),
-    (15, 5);  
-    
-    
-    
--- Insert sample Worker-Service relationships
-INSERT INTO WorkerService (worker_id, service_id) 
-SELECT wc.worker_id, s.id 
-FROM WorkerCategory wc
-JOIN Service s ON wc.category_id = s.category_id;
-    
-    
+
     
    
 -- Insert sample services 
@@ -82,6 +65,20 @@ INSERT INTO Booking (requester_id, provider_id, service_id, status_id, date_requ
     (8, NULL, 6, 1, '2024-12-08', '18:00:00', '8901234567', '606 Fir St', '789012', 'Pool maintenance before holiday season'),
     (9, NULL, 9, 1, '2024-12-09', '19:00:00', '9012345678', '707 Poplar St', '890123', 'Furniture assembly for new apartment'),
     (10, NULL, 1, 1, '2024-12-10', '20:00:00', '0123456789', '808 Willow St', '901234', 'Deep cleaning for move-in');
+    
+
+INSERT INTO Worker (provider_id, name) VALUES
+    (101, 'Michael Cleaner'),
+    (102, 'Sarah Repair'),
+    (103, 'Tom HVAC'),
+    (104, 'Linda Pest'),
+    (105, 'Chris Install');
+
+-- Sample scenario: Update booking when a worker accepts a job
+UPDATE Booking SET provider_id = 101 WHERE id = 1; -- Michael Cleaner accepts job 1
+UPDATE Booking SET provider_id = 102 WHERE id = 2; -- Sarah Repair accepts job 2
+
+
 
 -- Insert sample payment methods (For future use)
 INSERT INTO PaymentMethod (name) VALUES 
