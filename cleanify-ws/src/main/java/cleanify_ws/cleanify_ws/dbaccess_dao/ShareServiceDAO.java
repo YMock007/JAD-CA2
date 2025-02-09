@@ -1,4 +1,4 @@
-package cleanify_ws.cleanify_ws.dbaccess_share_service;
+package cleanify_ws.cleanify_ws.dbaccess_dao;
 
 import cleanify_ws.cleanify_ws.dto.*;
 import cleanify_ws.cleanify_ws.dbaccess_common.DBConnection;
@@ -65,4 +65,8 @@ public class ShareServiceDAO {
 
         return new ArrayList<>(categoryMap.values());
     }
+    
+    
+    
+    
 }
