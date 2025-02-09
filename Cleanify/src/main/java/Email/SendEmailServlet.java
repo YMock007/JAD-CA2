@@ -155,8 +155,8 @@ public class SendEmailServlet extends HttpServlet {
                     setSessionMessage(request, "Booking was not successful.", "error");
                     response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
                 }
-                    throw new Exception("Booking was not successful.");
-                }
+            }
+                   
 
 
         } catch (Exception e) {

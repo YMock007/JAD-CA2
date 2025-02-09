@@ -17,12 +17,6 @@ public class InquiryServlet extends HttpServlet {
         super();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Inquiry> inquiries = InquiryDAO.getAllInquiries();
-        request.setAttribute("inquiries", inquiries);
-        request.getRequestDispatcher("/views/admin/dashboard/managing/inquiries/index.jsp").forward(request, response);
-    }
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             String action = request.getParameter("action");

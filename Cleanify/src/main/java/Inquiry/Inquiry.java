@@ -26,6 +26,15 @@ public class Inquiry {
 		this.description = description;
 	}
 	
+	public Inquiry(int id, String name, String email, String title, String description) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.title = title;
+		this.description = description;
+	}
+
 	public int getId() {
 		return id;
 	}

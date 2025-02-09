@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,29 +16,6 @@ public class InquiryDAO {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public static List<Inquiry> getAllInquiries() {
-        List<Inquiry> inquiries = new ArrayList<>();
-        String query = "SELECT id, username, email, title, description FROM Inquiry";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Inquiry inquiry = new Inquiry(
-                        rs.getString("username"),
-                        rs.getString("email"),
-                        rs.getString("title"),
-                        rs.getString("description")
-                );
-                inquiry.setId(rs.getInt("id"));
-                inquiries.add(inquiry);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return inquiries;
-    }
 
     public static boolean updateInquiryStatus(int inquiryId, int status) {
         String updateQuery = "UPDATE Inquiry SET status = ? WHERE id = ?";
@@ -97,6 +75,66 @@ public class InquiryDAO {
 	    }
 	    return inquiries;
 	}
+	
+	public static List<Inquiry> getInquiriesAdmin() {
+        String selectQuery = "SELECT id, username, email, title, description FROM Inquiry where status_id=1";
+        List<Inquiry> inquiries = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(selectQuery);
+             ResultSet rs = stmt.executeQuery()) {
+
+            System.out.println("Executing Query: " + selectQuery);  
+
+            while (rs.next()) {
+
+                // ✅ Use the constructor instead of calling setters
+                Inquiry inquiry = new Inquiry(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("title"),
+                    rs.getString("description")
+                );
+
+                inquiries.add(inquiry);
+            }
+
+            // ✅ Debugging: Print size of retrieved inquiries
+            System.out.println("Total Inquiries Retrieved: " + inquiries.size());
+
+        } catch (SQLException e) {
+            System.err.println("Error fetching inquiries for admin: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return inquiries;
+    }
+	
+	public static boolean updateInquiry(int id) {
+	    String updateQuery = "UPDATE Inquiry SET status_id = 2 WHERE id = ?";
+	    
+	    try (Connection conn = DatabaseConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+
+	        // ✅ Set the ID parameter
+	        stmt.setInt(1, id);
+
+	        // ✅ Execute update
+	        int rowsUpdated = stmt.executeUpdate();
+
+	        // ✅ Debugging logs
+	        System.out.println("🔍 [DEBUG] Executing Query: " + updateQuery);
+	        System.out.println("✅ [DEBUG] Rows Updated: " + rowsUpdated);
+
+	        return rowsUpdated > 0; // ✅ Return true if at least one row was updated
+
+	    } catch (SQLException e) {
+	        System.err.println("❌ [ERROR] Failed to update inquiry: " + e.getMessage());
+	        e.printStackTrace();
+	        return false; // ✅ Return false if an error occurs
+	    }
+	}
+
 
 
 }

@@ -1,8 +1,6 @@
 package Reporting;
 
 import Bookings.BookingReport;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import db.DatabaseConnection;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
