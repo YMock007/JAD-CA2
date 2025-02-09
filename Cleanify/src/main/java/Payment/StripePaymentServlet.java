@@ -40,7 +40,6 @@ public class StripePaymentServlet extends HttpServlet {
 
         try {
         	
-            // ✅ Retrieve and validate parameters
             String paymentMethodId = request.getParameter("paymentMethodId");
             String amountStr = request.getParameter("amount");
             String memberId = request.getParameter("memberId");
@@ -65,13 +64,11 @@ public class StripePaymentServlet extends HttpServlet {
                 throw new IllegalArgumentException("Invalid amount format.");
             }
 
-            // ✅ Convert bookingCartStr into List<Integer>
             List<Integer> serviceIds = extractServiceIds(bookingCartStr);
             if (serviceIds.isEmpty()) {
                 throw new IllegalArgumentException("Invalid booking cart data.");
             }
 
-            // ✅ Create a Payment Intent with Stripe
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
                 .setCurrency("sgd")
@@ -95,7 +92,6 @@ public class StripePaymentServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Create booking after successful payment
             boolean bookingCreated = createBooking(
             	request.getContextPath() + "/BookingServlet",
                 memberId, phoneNumber, address, postalCode,
@@ -110,7 +106,6 @@ public class StripePaymentServlet extends HttpServlet {
                 return;
             }
             cleanUpSession(request.getSession(false), serviceIds);
-            // ✅ Payment & booking successful
             jsonResponse.put("success", true);
             jsonResponse.put("paymentIntentId", paymentIntent.getId());
             jsonResponse.put("message", "Payment processed successfully.");

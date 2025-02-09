@@ -84,11 +84,8 @@ public class InquiryDAO {
              PreparedStatement stmt = conn.prepareStatement(selectQuery);
              ResultSet rs = stmt.executeQuery()) {
 
-            System.out.println("Executing Query: " + selectQuery);  
-
             while (rs.next()) {
 
-                // ✅ Use the constructor instead of calling setters
                 Inquiry inquiry = new Inquiry(
                     rs.getInt("id"),
                     rs.getString("username"),
@@ -99,9 +96,6 @@ public class InquiryDAO {
 
                 inquiries.add(inquiry);
             }
-
-            // ✅ Debugging: Print size of retrieved inquiries
-            System.out.println("Total Inquiries Retrieved: " + inquiries.size());
 
         } catch (SQLException e) {
             System.err.println("Error fetching inquiries for admin: " + e.getMessage());
@@ -116,22 +110,13 @@ public class InquiryDAO {
 	    try (Connection conn = DatabaseConnection.getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
 
-	        // ✅ Set the ID parameter
 	        stmt.setInt(1, id);
-
-	        // ✅ Execute update
 	        int rowsUpdated = stmt.executeUpdate();
-
-	        // ✅ Debugging logs
-	        System.out.println("🔍 [DEBUG] Executing Query: " + updateQuery);
-	        System.out.println("✅ [DEBUG] Rows Updated: " + rowsUpdated);
-
-	        return rowsUpdated > 0; // ✅ Return true if at least one row was updated
-
+	        return rowsUpdated > 0; 
 	    } catch (SQLException e) {
 	        System.err.println("❌ [ERROR] Failed to update inquiry: " + e.getMessage());
 	        e.printStackTrace();
-	        return false; // ✅ Return false if an error occurs
+	        return false;
 	    }
 	}
 

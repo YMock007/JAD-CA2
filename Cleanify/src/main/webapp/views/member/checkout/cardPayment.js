@@ -1,10 +1,8 @@
-// ✅ Initialize Stripe
 var stripe = Stripe("pk_test_51QopKmLLgHtQcF9Hr8GpFovhnRUYyorbvf4hQRWxRuUSVbpSJf7d5vqVrQBkDvzYAvIrzUlxquIVjcsg8z7ANUXU008bKLQhAa");
 var elements = stripe.elements();
 
-// ✅ Create and mount the card element with validation
 var card = elements.create('card', {
-    hidePostalCode: true, // ✅ Ensure ZIP code is hidden
+    hidePostalCode: true,
     style: {
         base: {
             fontSize: '16px',
@@ -21,12 +19,10 @@ var card = elements.create('card', {
 });
 card.mount('#card-element');
 
-// ✅ Handle form submission for Stripe payment
 document.getElementById('submit-payment').addEventListener('click', function (event) {
     event.preventDefault();
     var contextPath = document.getElementById('contextPath').value;
 
-    // ✅ Retrieve form values
     var memberId = document.getElementById('memberId').value;
     var phoneNumber = document.getElementById('phoneNumber').value.trim();
     var address = document.getElementById('address').value.trim();
@@ -37,12 +33,10 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
     var amount = document.getElementById('totalPrice').value.trim();
     amount = Math.round(parseFloat(amount));
 
-    // ✅ Construct billing address (combine address and city)
     let billingFullAddress = document.getElementById('billingAddress').value.trim() + ", " +
                              document.getElementById('billingCity').value.trim();
     let billingPostalCode = document.getElementById('billingPostalCode').value.trim();
 
-    // ✅ Validate card fields before proceeding
     stripe.createPaymentMethod({
         type: 'card',
         card: card,
@@ -54,20 +48,19 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
             }
         }
     }).then(function (result) {
-        console.log("DEBUG: PaymentMethod Response:", result); // ✅ Print Stripe response
+        console.log("DEBUG: PaymentMethod Response:", result);
 
         if (result.error) {
             document.getElementById('card-errors').textContent = result.error.message;
         } else {
             var paymentMethodId = result.paymentMethod.id;
-            console.log("DEBUG: PaymentMethod ID:", paymentMethodId); // ✅ Log payment method ID
+            console.log("DEBUG: PaymentMethod ID:", paymentMethodId);
 
             if (!paymentMethodId) {
                 document.getElementById('card-errors').textContent = "Failed to create Payment Method. Please try again.";
                 return;
             }
 
-            // ✅ Send Payment & Booking Data to `StripePaymentServlet`
             fetch(contextPath + "/StripePaymentServlet", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -88,7 +81,7 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
             })
             .then(response => response.json())
             .then(result => {
-                console.log("DEBUG: Server Response:", result); // ✅ Print full response
+                console.log("DEBUG: Server Response:", result);
 
                 if (result.success) {
                     window.location.href = result.redirect_url; 
@@ -97,7 +90,7 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
                 }
             })
             .catch(error => {
-                console.error("DEBUG: Fetch Error:", error); // ✅ Print detailed fetch errors
+                console.error("DEBUG: Fetch Error:", error);
                 document.getElementById('card-errors').textContent = "Payment process failed. Please try again.";
             });
         }
