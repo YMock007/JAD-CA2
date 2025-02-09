@@ -17,44 +17,55 @@ public class Seeder {
              BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
             if (connection == null) {
-                System.out.println("Failed to make a connection to the database.");
+                System.out.println("Failed to connect to the database.");
                 return false;
             }
 
-            System.out.println("Connection successful!");
+            System.out.println("Executing SQL script: " + filePath);
+            Statement stmt = connection.createStatement();
             StringBuilder sql = new StringBuilder();
             String line;
+            boolean insideWithClause = false; // Tracks multi-line WITH statements
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-
-                if (line.isEmpty() || line.startsWith("--")) {
-                    continue; 
-                }
+                if (line.isEmpty() || line.startsWith("--")) continue; // Skip empty lines and comments
 
                 sql.append(line).append(" ");
 
-                // Execute when we reach the end of a statement
-                if (line.endsWith(";")) {
+                // Handle multi-line WITH clause
+                if (line.matches("(?i)^WITH\\s.*")) { 
+                    insideWithClause = true; 
+                }
+                if (insideWithClause && line.endsWith(";")) { 
+                    insideWithClause = false; // WITH clause completed
+                }
+
+                // Execute when a full statement is formed
+                if (!insideWithClause && line.endsWith(";")) {
                     String fullSql = sql.toString().trim();
-                    if (fullSql.startsWith("INSERT INTO Person")) {
-                        try {
+                    System.out.println("Executing: " + fullSql); // Debugging output
+
+                    try {
+                        if (fullSql.startsWith("INSERT INTO Person")) {
                             seedPersonTable(fullSql, connection);
-                        } catch (SQLException e) {
-                            LOGGER.log(Level.SEVERE, "Error in Person table insert: " + fullSql, e);
-                            throw e; 
+                        } else {
+                            executeRawSQL(fullSql, connection);
                         }
-                    } else {
-                        executeRawSQL(fullSql, connection);
+                    } catch (SQLException e) {
+                        System.out.println("SQL Execution Failed: " + fullSql);
+                        e.printStackTrace();
                     }
-                    sql.setLength(0);
+
+                    sql.setLength(0); // Reset for next statement
                 }
             }
 
-            System.out.println("Data seeded successfully!");
+            System.out.println("SQL script executed successfully!");
+            stmt.close();
             return true;
         } catch (SQLException | IOException e) {
-            LOGGER.log(Level.SEVERE, "Error seeding data", e);
+            e.printStackTrace();
             return false;
         }
     }

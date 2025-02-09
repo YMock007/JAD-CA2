@@ -1,74 +1,58 @@
 @charset "UTF-8";
 
-/* General styling */
+/* General Styling */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    background-color: #f4f6f9;
+    color: #343a40;
 }
-
-/* Navbar Styling */
-.navbar {
-    display: flex;
-    background-color: #333;
-    padding: 10px;
-}
-
-.navbar a {
-    color: #ffffff;
-    padding: 10px 20px;
-    text-decoration: none;
-}
-
-.navbar a:hover {
-    background-color: #555;
-}
-
 /* Dashboard Header */
 h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0056b3;
-    margin-bottom: 30px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #495057;
     text-align: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 15px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
 }
 
-/* Links Section */
+/* Admin Links Section */
 .admin-links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    justify-content: space-around;
 }
 
 .admin-links a {
     text-decoration: none;
-    color: white;
+    color: #ffffff;
     padding: 15px 25px;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Button colors */
+/* Button Colors */
 .btn-primary { background-color: #007bff; }
 .btn-info { background-color: #17a2b8; }
 .btn-warning { background-color: #ffc107; }
 .btn-success { background-color: #28a745; }
 
-/* Hover effects */
+/* Hover Effects */
 .admin-links a:hover {
-    transform: translateY(-3px);
+    transform: scale(1.05);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .admin-links a:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: scale(0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

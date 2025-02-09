@@ -144,6 +144,30 @@ public class PersonList {
         return null; 
     }
     
+    public static String getCleanerNameById(int providerId) {
+        String query = "SELECT name FROM Worker WHERE provider_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, providerId); // ✅ Set the providerId before executing
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("name"); // ✅ Return only the name
+            } else {
+                System.out.println("❌ [ERROR] No cleaner found for provider_id: " + providerId);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ [ERROR] SQL Exception while fetching cleaner name: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null; // Return null if no cleaner is found
+    }
+
     public static List<Person> getAllCleaners() {
         List<Person> cleaners = new ArrayList<>();
         String query = "SELECT p.*, r.name AS role_name FROM Person p " +

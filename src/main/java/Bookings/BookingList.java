@@ -75,4 +75,79 @@ public class BookingList {
 	        return false;
 	    }
 	}
+	
+	public static boolean createBookingWithPayment(
+		    int memberId,
+		    List<Integer> serviceIds,
+		    int statusId,
+		    Date dateRequested,
+		    Time timeRequested,
+		    String phoneNumber,
+		    String address,
+		    String postalCode,
+		    String specialRequest,
+		    double amount,
+		    int paymentMethodId,
+		    byte[] paymentDetails,
+		    String billingAddress,
+		    String billingPostalCode
+		) throws SQLException {
+		    Connection conn = null;
+		    CallableStatement stmt = null;
+
+		    try {
+		        conn = DatabaseConnection.getConnection();
+		        conn.setAutoCommit(false);
+
+		        // ✅ Convert List<Integer> to SQL Array
+		        Array servicesArray = conn.createArrayOf("INTEGER", serviceIds.toArray(new Integer[0]));
+
+		        // ✅ Prepare Callable Statement (Explicit Casts for PostgreSQL)
+		        stmt = conn.prepareCall("{ CALL create_bookings_and_payment(?, ?, ?, CAST(? AS DATE), CAST(? AS TIME), ?, ?, ?, ?, CAST(? AS NUMERIC), ?, ?, ?, ?, ?) }");
+
+		        // ✅ Set Parameters Explicitly
+		        stmt.setInt(1, memberId);
+		        stmt.setArray(2, servicesArray);
+		        stmt.setInt(3, statusId);
+		        stmt.setDate(4, dateRequested);
+		        stmt.setTime(5, timeRequested);
+		        stmt.setString(6, phoneNumber);
+		        stmt.setString(7, address);
+		        stmt.setString(8, postalCode);
+		        stmt.setString(9, specialRequest);
+		        stmt.setDouble(10, amount);
+		        stmt.setInt(11, paymentMethodId);
+		        stmt.setBytes(12, paymentDetails);
+		        stmt.setString(13, (paymentMethodId == 1) ? billingAddress : null);
+		        stmt.setString(14, (paymentMethodId == 1) ? billingPostalCode : null);
+
+		        // ✅ Register Output Parameter for Payment ID
+		        stmt.registerOutParameter(15, Types.BIGINT);
+
+		        // ✅ Execute Procedure
+		        stmt.execute();
+		        long paymentId = stmt.getLong(15);
+
+		        // ✅ Commit and Return
+		        if (paymentId > 0) {
+		            conn.commit();
+		            return true;
+		        } else {
+		            conn.rollback();
+		            return false;
+		        }
+
+		    } catch (SQLException e) {
+		        if (conn != null) conn.rollback();
+		        e.printStackTrace();
+		        return false;
+		    } finally {
+		        if (stmt != null) stmt.close();
+		        if (conn != null) conn.close();
+		    }
+		}
+
+
+
+
 }

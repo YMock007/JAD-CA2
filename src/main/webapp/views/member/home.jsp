@@ -11,39 +11,52 @@
     <style>
         body {
     		font-family: Arial, sans-serif;
-            background: linear-gradient(#eceffe, #ced6fb);
+            background: rgb(20,155,159);
+			background: linear-gradient(180deg, rgba(20,155,159,0.9) 20%, rgba(255,255,255,1) 50%, rgba(20,155,159,0.6) 80%);
+            position: relative;
 }
-
-		
+	
 		.container{
 			max-width: 1280px;
 			margin: 0 auto;
 		}
-		
-        /* Intro Section */
+
         #intro-section {
-            min-height: 82vh;
+            min-height: 90vh;
             display: grid;
             align-items: center;
+            gap: 40px;
             justify-content: space-between;
-            padding: 2rem;
             grid-template-columns: 1fr 1fr;
+            
         }
 
         .intro-title {
             font-size: 4rem;
             font-weight: 700;
-            color: #00bcd4;
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 4px 6px rgba(0, 0, 0, 1);
         }
 
         .intro-description {
             font-size: 1.3rem;
             line-height: 1.6;
             color: #fff;
-            text-shadow: 2px 2px 3px #000;
+            text-shadow: 1px 2px 1px #000;
+        }
+        
+        #imgContainer{
+        	width: 80%;
+        	height: 80%;
+        	padding: 10px;
+        }
+        
+        #imgContainer img{
+			width: 600px;
+			height: 600px;
+			border-top-left-radius: 30px;
+			border-bottom-right-radius: 30px;
         }
 
         .service-cards-container {
@@ -161,6 +174,7 @@
         <%@ include file="/views/Util/components/header/header.jsp" %>
 
     <!-- Intro Section -->
+    <div class="intro">
     <div id="intro-section" class="container">
         <div class="intro-text-container">
             <h2 class="intro-title"><span>Welcome to</span> Cleanify!</h2>
@@ -173,7 +187,9 @@
             <img src="<%= request.getContextPath() %>/resources/serviceImg/serviceMain.jpg" alt="Cleanify Services" />
         </div>
     </div>
+    </div>
 
+    <div class="service">
     <!-- How We Care and How We Clean Sections -->
 	<section class="services-section  container">
 	    <h2 class="section-header text-center">Our Commitment to Excellence</h2>
@@ -195,6 +211,7 @@
 	        </div>
 	    </div>
 	</section>
+    </div>
 
 
 
@@ -231,6 +248,7 @@
 
     <%@ include file="/views/Util/components/swiper/serviceSwiper.jsp" %>
     <%@ include file="/views/Util/notification.jsp" %>
+    <%@ include file="/views/Util/components/inquiry/inquiry.jsp" %>
 	<%@ include file="/views/Util/components/footer/footer.jsp" %>
 </body>
 </html>

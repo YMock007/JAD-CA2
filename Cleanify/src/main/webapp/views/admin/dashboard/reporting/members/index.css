@@ -1,0 +1,45 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+h2 {
+	padding-top: 1rem;
+}
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.table {
+    margin: 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.table-striped tbody tr {
+    cursor: pointer;
+}
+
+.table-striped tbody tr.collapsed {
+    background-color: #e9ecef;
+}
+
+.list-group {
+    margin-bottom: 0;
+}
+
+.list-group-item {
+    border: none;
+    background: #f8f9fa;
+}

@@ -25,34 +25,29 @@
             margin: 0;
             box-sizing: border-box;
         }
-
-        #main-section {
-        	max-width: 1280px;
-        	margin: 1.5rem auto;
-            min-height: 50vh;
-            display: flex;
-            align-items: space-between;
-            justify-content: center;
-            border: 1px solid black;
-            box-shadow: 4px 5px 4px #474747;
-            border-radius: 1.4rem;
-        }
-
-        #detailForService {
-            display: flex;
-            justify-content: space-evenly;
-            align-items: center;
+        
+        body{
+        background: linear-gradient(#eceffe, #ced6fb);
+        min-height: 100vh
         }
 
         #cartItemsContainer {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-end;
-            background: var(--text-teal);
-            border-top-left-radius: 1.4rem;
-            border-bottom-left-radius: 1.4rem;
+        	max-width: 1280px;
+        	min-height: 80vh;
+        	margin: 1.5rem auto;
+            background: #fff;
+            color: #000;
+            padding: 20px;
             position: relative;
+            border: 2px solid var(--text-teal);
+            border-radius: 5px;
+        }
+        
+        #detailForService{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
         }
         
         #headerForCartItems {
@@ -73,13 +68,17 @@
         }
 
         #cartItems {
-            min-height: 30vh;
+            max-height: 55vh;
             height: auto;
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             padding: 0 1.4rem 1.4rem;
+            overflow-y : auto;
+            border-top: 2px solid var(--text-teal);
+            border-bottom: 2px solid var(--text-teal);
+            padding: 10px 5px;
         }
 
         #cartImgContainer img {
@@ -95,10 +94,9 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 1.4rem;
+            padding:2rem 1.4rem;
             border: none;
-            border-bottom: 2px solid #474747;
-            color: #fff;
+            color: #000;
             text-decoration: none;
             cursor: pointer;
             background: transparent;
@@ -115,7 +113,7 @@
         }
 
         #totalPriceCart {
-            color: #fff;
+            color: #000;
             text-align: end;
             padding: 0 1.4rem 1.4rem;
             position: absolute;
@@ -130,6 +128,38 @@
         	display : flex;
         	align-items : center;
         	justify-content : center;
+        }
+        
+        #proceedToCheckoutBtn{
+        	position: absolute;
+        	bottom: 35px;
+        	right: 20px;
+        	text-decoration: none;
+        	border-radius: 5px;
+        	background: var(--text-blue);
+        	color: white;
+        	padding: 5px 10px;
+        	transition: ease-in .5s
+        }
+        
+        #infoTextSelect{
+        	position: absolute;
+        	font-size: 14px;
+        	bottom: 35px;
+        	left: 20px;
+        	color: blue;
+        	padding: 5px 10px;
+        }	
+        
+        #proceedToCheckoutBtn:hover{
+        	
+        	text-decoration: none;
+        	border-radius: 5px;
+        	background: rgb(23,170,193);
+			background: linear-gradient(90deg, rgba(23,170,193,1) 0%, rgba(10,100,130,1) 100%);
+        	color: #e6f3ff;
+        	padding: 5px 10px;
+        	transition: ease-in .5s
         }
 
         input[type="checkbox"] {
@@ -179,7 +209,7 @@
             font-style: normal;
             border-radius: 5px;
             width: 100%;
-            border: 1px solid #3ac162;
+            border: 1px solid var(--text-teal);
             margin-bottom: 10px;
             box-sizing: border-box;
         }
@@ -213,6 +243,14 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
             border-radius: 100%;
         }
+        
+        .noItemText {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    text-align: center;
+		}
 
         #inputsUserData {
             max-height: 80vh;
@@ -231,35 +269,31 @@
 </head>
 <body>
     <%@ include file="/views/Util/components/header/header.jsp" %>
-    <%@ include file="/views/Util/notification.jsp" %>
 
     <%
 		HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
 		HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
-		
+
 		if (person != null) {
 		    boolean isCartEmpty = (cart == null || cart.isEmpty());
 		    boolean isBookingEmpty = (booking == null || booking.isEmpty());
 		
 		    if (isCartEmpty && isBookingEmpty) {
 		%>
-		    <div class="container-fluid">
-		        <div id="emptyCartMessage" class="text-center">
-		            <p>No service in the cart</p>
-		        </div>
-		    </div>
+		    <div class="noItemText">
+			        <span>Your cart is empty!</span>
+			 </div>
 		<%
 		    } else {
 		%>
 		    <div class="container-fluid">
-		        <div class="row" id="main-section">
-		            <div id="cartItemsContainer" class="col-lg-8 col-md-8 col-sm-12">
+		            <div id="cartItemsContainer">
 		                <%
 		                List<Service> cartItems = ServiceList.getServicesByCart(cart);
 		                %>
 		                <div id="headerForCartItems">
 		                    <div>Your Cart...</div>
-		                    <span><%= cartItems.size() %></span>
+		                    <span>Total Services: <%= cartItems.size() %></span>
 		                </div>
 		                <div id="cartItems">
 		                    <%
@@ -300,84 +334,28 @@
 		                            </form>
 		                        </div>
 		                        <%
-		                        totalPriceForCart += service.getPrice();
+		                        if(booking.containsKey(service.getId())){
+		                        	totalPriceForCart += service.getPrice();
+		                        }
+		                        
 		                        }
 		                    }
+		                    session.setAttribute("totalPrice", totalPriceForCart);
 		                    %>  
 		                </div>
-		                <div id="totalPriceCart">Total Payable Price: S$<%= totalPriceForCart %></div>
-		            </div>
-		            <div id="inputsUserData" class="col-lg-4 col-md-4 col-sm-12">
-					    <form action="<%= request.getContextPath() %>/BookingServlet" method="post" onsubmit="return validateForm()">
-					        <input type="hidden" name="memberId" value="<%= person.getId() %>">
-					    
-					        <h1>Booking Form</h1>
-					    
-					        <!-- Phone Number Input -->
-					        <div class="form-group">
-					            <label for="phoneNumber">Phone Number</label>
-					            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" pattern="\d{8}" required>
-					        </div>
-					    
-					        <!-- Address Input -->
-					        <div class="form-group">
-					            <label for="address">Address</label>
-					            <input type="text" class="form-control" id="address" name="address" required>
-					        </div>
-					    
-					        <!-- Postal Code Input -->
-					        <div class="form-group">
-					            <label for="postalCode">Postal Code</label>
-					            <input type="text" class="form-control" id="postalCode" name="postalCode" pattern="\d{6}" required>
-					        </div>
-					    
-					        <!-- Appointment Date Input -->
-					        <div class="form-group">
-					            <label for="appointmentDate">Appointment Date</label>
-					            <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
-					        </div>
-					    
-					        <!-- Appointment Time Input -->
-					        <div class="form-group">
-					            <label for="appointmentTime">Appointment Time</label>
-					            <select class="form-select" id="appointmentTime" name="appointmentTime"  style="font-size : 14px;" required>
-					                <option value="" selected disabled></option>
-					                <% 
-					                    int startHour = 8;
-					                    int interval = 4;
-					                    int endHour = 20;
-					                    for (int hour = startHour; hour <= endHour; hour += interval) {
-					                        String timeValue = String.format("%02d:00", hour); 
-					                        String displayTime = (hour > 12 ? (hour - 12) : hour) + ":00 " + (hour >= 12 ? "PM" : "AM");
-					                %>
-					                    <option value="<%= timeValue %>"><%= displayTime %></option>
-					                <% 
-					                    }
-					                %>
-					            </select>
-					        </div>
-					    
-					        <!-- Special Request Text Area -->
-					        <div class="form-group">
-					            <label for="specialRequest">Special Request</label>
-					            <textarea id="specialRequest" name="specialRequest" class="form-control" placeholder="Enter any special requests here" style="max-height: 150px; min-height: 100px; overflow-y: auto;"></textarea>
-					        </div>
-					
-					        <% 
-					            if (booking == null || booking.isEmpty()) {
-					        %>
-					            <div class="alert alert-warning" role="alert">
-					                Please select a service for booking.
-					            </div>
-					        <% 
-					            }
-					        %>
-					    
-					        <!-- Submit Button -->
-					        <button type="submit" class="btn btn-primary" <% if (isBookingEmpty) { %> disabled <% } %>>Checkout</button>
-					    </form>
-					</div>
-		        </div>
+		                <span id="infoTextSelect">Only the selected services will proceed for checkout.</span>
+		                <a id="proceedToCheckoutBtn"
+						   href="${pageContext.request.contextPath}/views/member/checkout/checkout.jsp"
+						   <% if (booking == null || booking.isEmpty()) { %> 
+						       class="btn btn-secondary disabled" aria-disabled="true" 
+						   <% } else { %>
+						       class="btn btn-primary"
+						   <% } %>
+						>
+						   Proceed to Checkout
+						</a>
+
+		            </div>		
 		    </div>
 		<%
 		    }
@@ -389,9 +367,13 @@
 		}
 		%>
 
-
+        <%@ include file="/views/Util/notification.jsp" %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="<%= request.getContextPath() %>/views/member/cart/validate.js" type="text/javascript"></script>
-    
+    <script>
+    $(function() {
+    	  $('[data-toggle="tooltip"]').tooltip()
+    	})
+    </script>
 </body>
 </html>

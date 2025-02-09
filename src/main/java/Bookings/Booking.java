@@ -46,6 +46,7 @@ public class Booking {
     private String address;
     private String postalCode;
     private String remark;
+    private String providerName;
 
     // Getters and Setters
     public int getId() {
@@ -56,7 +57,15 @@ public class Booking {
         this.id = id;
     }
 
-    public int getRequesterId() {
+    @Override
+	public String toString() {
+		return "Booking [id=" + id + ", requesterId=" + requesterId + ", providerId=" + providerId + ", serviceId="
+				+ serviceId + ", statusId=" + statusId + ", dateRequested=" + dateRequested + ", timeRequested="
+				+ timeRequested + ", phNumber=" + phNumber + ", address=" + address + ", postalCode=" + postalCode
+				+ ", remark=" + remark + ", providerName=" + providerName + "]";
+	}
+
+	public int getRequesterId() {
         return requesterId;
     }
 

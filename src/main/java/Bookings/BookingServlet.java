@@ -8,10 +8,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.*;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.sql.Time;
+import java.sql.Date;
 import java.util.*;
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @WebServlet("/BookingServlet")
 public class BookingServlet extends HttpServlet {
@@ -19,110 +24,96 @@ public class BookingServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // Retrieve form parameters and validate them
-            String memberIdStr = request.getParameter("memberId");
-            int memberId = Integer.parseInt(memberIdStr);
-            String phoneNumber = request.getParameter("phoneNumber");
-            String address = request.getParameter("address");
-            String postalCode = request.getParameter("postalCode");
-            String specialRequest = request.getParameter("specialRequest");
-            String appointmentDate = request.getParameter("appointmentDate");
-            String appointmentTime = request.getParameter("appointmentTime");
-
-            // Default time of 00:00:00 for date-only input if no time is provided
-            if (appointmentDate != null && !appointmentDate.isEmpty() && (appointmentTime == null || appointmentTime.isEmpty())) {
-                appointmentTime = "00:00:00"; // Use midnight time if no time is given
+        	setSessionMessage(request, "Processing...Please wait for a while...", "success");
+            String paymentIntentId = request.getParameter("paymentIntentId");
+            if (paymentIntentId == null || paymentIntentId.isEmpty()) {
+                setSessionMessage(request, "Payment verification failed. Try again.", "error");
+                response.sendRedirect(request.getContextPath() + "/views/member/booking/booking.jsp");
+                return;
             }
+            byte[] paymentDetails = paymentIntentId.getBytes(StandardCharsets.UTF_8);
+            int memberId = Integer.parseInt(request.getParameter("memberId").trim());
+            String phoneNumber = request.getParameter("phoneNumber").trim();
+            String address = request.getParameter("address").trim();
+            String postalCode = request.getParameter("postalCode").trim();
+            String specialRequest = request.getParameter("specialRequest") != null ? request.getParameter("specialRequest").trim() : "";
+            String appointmentDateStr = request.getParameter("appointmentDate").trim();
+            String appointmentTimeStr = request.getParameter("appointmentTime").trim();
+            String billingAddress = request.getParameter("billingAddress");
+            String billingPostalCode = request.getParameter("billingPostalCode");
 
-            // Parse appointment date (as Date) and appointment time (as Time)
-            java.sql.Date dateRequested = null;
-            if (appointmentDate != null && !appointmentDate.isEmpty()) {
-                dateRequested = java.sql.Date.valueOf(appointmentDate); 
-            }
-
-            java.sql.Time timeRequested = null;
-            if (appointmentTime != null && !appointmentTime.isEmpty()) {
-                // Convert appointmentTime to java.sql.Time (HH:MM:SS format)
-                timeRequested = java.sql.Time.valueOf(appointmentTime + ":00");
-            }
-
-            // Default status ID
+            billingAddress = (billingAddress != null && !billingAddress.equals("")) ? billingAddress.trim() : "";
+            billingPostalCode = (billingPostalCode != null && !billingPostalCode.equals("")) ? billingPostalCode.trim() : "";
+            String bookingCartStr = request.getParameter("bookingCart");
+            Date dateRequested = Date.valueOf(appointmentDateStr);
+            Time timeRequested = (appointmentTimeStr != null && !appointmentTimeStr.isEmpty()) ?
+                    Time.valueOf(appointmentTimeStr + ":00") : Time.valueOf("00:00:00");
+            double amount = Double.parseDouble(request.getParameter("amount"));
+            int paymentMethodId = Integer.parseInt(request.getParameter("paymentMethodId"));
             int statusId = 1;
+            List<Integer> serviceIds = extractServiceIds(bookingCartStr);
 
-            // Get the booking HashMap from session
-            HttpSession session = request.getSession(false); // Use false to avoid creating a new session
-            if (session == null) {
-                setSessionMessage(request, "Session expired. Please log in again.", "error");
-                response.sendRedirect(request.getContextPath() + "/views/member/home.jsp");
+            if (serviceIds.isEmpty()) {
+                setSessionMessage(request, "No services selected for booking.", "error");
+                response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
                 return;
             }
 
-            @SuppressWarnings("unchecked")
-            HashMap<Integer, Integer> booking = (HashMap<Integer, Integer>) session.getAttribute("booking");
+            boolean success = BookingList.createBookingWithPayment(
+                    memberId, serviceIds, statusId, dateRequested, timeRequested, phoneNumber,
+                    address, postalCode, specialRequest, amount, paymentMethodId, paymentDetails,
+                    (paymentMethodId == 1) ? billingAddress : null,
+                    (paymentMethodId == 1) ? billingPostalCode : null
+            );
 
-            // Ensure the booking HashMap is not empty
-            if (booking != null && !booking.isEmpty()) {
-                boolean success = true;
-
-                // Create a list to store the keys of services to remove after processing
-                List<Integer> keysToRemove = new ArrayList<>();
-
-                // Loop through all services in the booking HashMap
-                for (Entry<Integer, Integer> entry : booking.entrySet()) {
-                    int serviceId = entry.getKey(); // Retrieve service ID
-
-                    // Create booking entry for each service
-                    boolean isCreated = BookingList.createBooking(
-                            memberId, serviceId, statusId,
-                            dateRequested, timeRequested, phoneNumber,
-                            address, postalCode, specialRequest
-                    );
-
-                    // If any of the bookings failed, set success to false
-                    if (!isCreated) {
-                        success = false;
-                        break;
-                    }
-
-                    // Remove the serviceId from the cart if it exists
-                    HashMap<Integer, Integer> cart = (HashMap<Integer, Integer>) session.getAttribute("cart");
-                    if (cart != null && cart.containsKey(serviceId)) {
-                        cart.remove(serviceId);
-                        session.setAttribute("cart", cart);
-                    }
-
-                    // Add the serviceId to the list of keys to remove
-                    keysToRemove.add(serviceId);
-                }
-
-                // After the loop, remove the services from the booking map
-                for (Integer key : keysToRemove) {
-                    booking.remove(key);
-                }
-
-                // Respond based on success or failure
-                if (success) {
-                    setSessionMessage(request, "Booking successfully processed.", "success");
-                    response.sendRedirect(request.getHeader("Referer"));
-                } else {
-                    setSessionMessage(request, "Error occurred while processing the booking.", "error");
-                }
+            if (success) {
+                setSessionMessage(request, "Booking successfully created.", "success");
+                response.sendRedirect(request.getContextPath() + "/views/member/booking/index.jsp");
             } else {
-                setSessionMessage(request, "No services selected for booking.", "error");
+                setSessionMessage(request, "Booking creation failed. Try again later.", "error");
+                response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
             }
+
         } catch (NumberFormatException e) {
+            System.out.println("ERROR: NumberFormatException - " + e.getMessage());
             setSessionMessage(request, "Invalid number format: " + e.getMessage(), "error");
+            response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
+        } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: IllegalArgumentException - " + e.getMessage());
+            setSessionMessage(request, "Invalid date format. Please use YYYY-MM-DD.", "error");
+            response.sendRedirect(request.getContextPath() + "/views/member/booking/booking.jsp");
         } catch (Exception e) {
+            System.out.println("ERROR: General Exception - " + e.getMessage());
             e.printStackTrace();
             setSessionMessage(request, "Error processing booking: " + e.getMessage(), "error");
+            response.sendRedirect(request.getContextPath() + "/views/member/cart.jsp");
         }
     }
 
-    // Set session message
+
+    private List<Integer> extractServiceIds(String bookingCartStr) {
+        List<Integer> serviceIds = new ArrayList<>();
+        
+        if (bookingCartStr != null && !bookingCartStr.trim().isEmpty()) {
+            try {
+                if (bookingCartStr.startsWith("[") && bookingCartStr.endsWith("]")) {
+                    Type listType = new TypeToken<List<Integer>>() {}.getType();
+                    serviceIds = new Gson().fromJson(bookingCartStr, listType);
+                } else {
+                    serviceIds = Arrays.stream(bookingCartStr.split(","))
+                                       .map(Integer::parseInt)
+                                       .collect(Collectors.toList());
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: Failed to parse bookingCartStr - " + e.getMessage());
+            }
+        }
+        return serviceIds;
+    }
+
     private void setSessionMessage(HttpServletRequest request, String message, String status) {
         HttpSession session = request.getSession();
         session.setAttribute("message", message);
         session.setAttribute("status", status);
     }
 }
-

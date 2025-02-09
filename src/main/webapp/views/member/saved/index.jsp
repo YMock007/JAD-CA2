@@ -21,7 +21,6 @@
 body {
     background: linear-gradient(#eceffe, #ced6fb);
     min-height: 100vh;
-    font-family: Arial, sans-serif;
 }
 
 /* Container for the grid */
@@ -156,6 +155,14 @@ button.btn {
 		    background-color: #1565C0; /* Darker Blue */
 		    transform: translateY(-2px);
 		}
+		
+		.noItemText {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    text-align: center;
+		}
 
 
 /* Responsive design for smaller screens */
@@ -181,9 +188,9 @@ button.btn {
     List<Saved> savedItems = person.getSavedItems();
     if (savedItems.isEmpty()) { 
     %>
-        <div class="text-center">
-            <p>No saved services available.</p>
-        </div>
+        <div class="noItemText">
+			  <span>Your saved services list is empty!</span>
+		</div>
     <% } else { %>
         <div class="grid" id="cards">
 		    <% if (savedItems != null && !savedItems.isEmpty()) { %>
@@ -192,7 +199,7 @@ button.btn {
 		                <form action="${pageContext.request.contextPath}/serviceServlet" method="GET" id="cart-container">
 		                    <input type="hidden" name="service_id" value="<%= saved.getServiceId() %>" />
 		                    <button class="card-item-submit-Btn" type="submit" class="btn btn-secondar">
-			                    <img src="<%= request.getContextPath() + '/' + saved.getServiceImageUrl() %>" 
+			                    <img src="<%= saved.getServiceImageUrl() %>" 
 	                         		alt="<%= saved.getServiceName() %>" class="img-fluid rounded">
 				                <div class="card-body">
 				                    <p class="serviceName">Service name: <%= saved.getServiceName() %></p>
@@ -224,8 +231,6 @@ button.btn {
 		                </div>
 		            </div>
 		        <% } %>
-		    <% } else { %>
-		        <p>No saved items available.</p>
 		    <% } %>
 		</div>
 
