@@ -4,6 +4,7 @@
 <%@ page import="Reviews.Review" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.time.LocalDate" %> 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -409,8 +410,9 @@
     <!-- Include the JavaScript File -->
     <script src="index.js"></script>
     <%@ include file="/views/Util/components/swiper/serviceSwiper.jsp" %>
-    <%@ include file="/views/Util/notification.jsp" %>
     <%@ include file="/views/Util/components/footer/footer.jsp" %>
+    <%@ include file="/views/Util/notification.jsp" %>
+
 
 </body>
 </html>

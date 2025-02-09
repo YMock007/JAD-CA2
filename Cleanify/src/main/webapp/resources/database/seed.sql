@@ -37,7 +37,6 @@ INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_i
     ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '158792', 3, FALSE),
     ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '168731', 3, FALSE);
 
-
     INSERT INTO Inquiry (email, username, title, description, created_at) VALUES 
     ('john@example.com', 'John Doe', 'Login Issue', 'I cannot log into my account. Please help.', '2024-02-08 09:30:00'),
     ('jane@example.com', 'Jane Smith', 'Billing Question', 'I have a question about my recent invoice.', '2024-02-08 10:00:00'),

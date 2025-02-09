@@ -21,8 +21,6 @@
             margin: 0;
             font-weight : 500;
         }
-        
-        
 
         /* Sticky Header Styles - Scoped to 'header' */
         header {
@@ -32,6 +30,21 @@
             top: 0;
             z-index: 1000;
             width: 100%;
+            
+            /* ✅ Add Blur Effect at Bottom */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* Soft shadow */
+        }
+
+        /* ✅ Add Gradient Blur Effect */
+        .header-blur {
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(to bottom, rgba(23, 162, 184, 0.6), rgba(255, 255, 255, 0));
+            filter: blur(5px);
+            pointer-events: none;
         }
 
         /* Scoped Logo Style */
@@ -86,8 +99,8 @@
                                 <a class="nav-link" href="${pageContext.request.contextPath}/views/profile/profile.jsp">User Profile</a>
                             </li>
                             <li class="nav-item">
-							    <a class="nav-link" href="${pageContext.request.contextPath}/LogoutServlet">Log out</a>
-							</li>
+                                <a class="nav-link" href="${pageContext.request.contextPath}/LogoutServlet">Log out</a>
+                            </li>
                         <% } else if (person.getRoleId() == 2) { %> 
                             <!-- Member Navigation -->
                             <li class="nav-item">
@@ -109,9 +122,8 @@
                                 <a class="nav-link" href="${pageContext.request.contextPath}/views/profile/profile.jsp">User Profile</a>
                             </li>
                             <li class="nav-item">
-							    <a class="nav-link" href="${pageContext.request.contextPath}/LogoutServlet">Log out</a>
-							</li>
-
+                                <a class="nav-link" href="${pageContext.request.contextPath}/LogoutServlet">Log out</a>
+                            </li>
                         <% } %>
                     <% } else { %>
                         <!-- Guest Navigation -->
@@ -128,7 +140,10 @@
                 </ul>
             </nav>
         </div>
+
+        <!-- ✅ Blur Effect Layer -->
+        <div class="header-blur"></div>
+
     </header>
 </body>
-
 </html>

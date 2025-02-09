@@ -1,4 +1,5 @@
 <%@ page import="Persons.Person" %>
+<%@ page import="Inquiry.Inquiry, Inquiry.InquiryDAO, java.util.List" %>
 <%@ include file="/views/Util/auth/memberAuth.jsp" %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -11,8 +12,299 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Profile with Overlay</title>
-    <link rel="stylesheet" href="profile.css">
 </head>
+<style>
+
+    :root {
+        --bg-primary: #474747;
+        --bg-secondary: #17a2b8;
+        --text-white: #ffffff;
+        --text-blue: #007bff;
+        --text-teal: #17a2b8;
+        --input-bg: #f9f9f9;
+        --input-border: #ccc;
+        --button-hover: #45a049;
+    }
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.overlay-container {
+    display: flex;
+    width: 1280px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-top: 30px;
+    height: 80vh;
+}
+
+.sidebar {
+    width: 25%;
+    color: #000;
+    padding: 20px;
+    border: 5px solid var(--text-teal);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+}
+
+.sidebar ul li {
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background: var(--text-teal);
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+    background: rgb(23,170,193);
+	background: linear-gradient(113deg, rgba(23,170,193,1) 0%, rgba(146,192,207,1) 84%);
+}
+
+.form-container {
+    width: 100%;
+    padding: 40px;
+    background: #fff;
+    overflow-y: auto;
+    border: 5px solid var(--text-teal);
+    border-left: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.tab-content {
+    display: none;
+    gap: 10px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 100%  
+}   
+
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+input:focus {
+    border-color: #0077B6;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+input {
+    width: 50%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box; 
+    margin-bottom: 5px;
+}
+
+input:focus {
+    border-color: #0077B6;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.5);
+    outline: none;
+}
+
+button.btn {
+    width: auto;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button.btn-primary {
+    background-color: var(--text-teal);
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-primary:hover {
+    background-color: #005f8c;
+}
+
+button.btn-danger {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    transition: background 0.3s;
+}
+
+button.btn-danger:hover {
+    background-color: #b52b2b;
+}
+
+button[disabled] {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+h2.form-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+button#editProfile {
+    margin-top: 20px;
+}
+
+button#updateProfileSection {
+    margin-top: 20px;
+}
+
+#inquiryForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#inquiryForm input,
+#inquiryForm textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#inquiryForm label {
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+#inquiryForm button {
+    margin-top: 20px;
+    padding: 12px;
+    background: rgb(60,231,235);
+	background: linear-gradient(163deg, rgba(60,231,235,0.980071252133666) 25%, rgba(23,125,108,1) 86%);
+    border-radius: 50%;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 5px;
+}	
+
+#inquiryForm button:hover {
+    background: rgb(74,199,202);
+	background: linear-gradient(234deg, rgba(74,199,202,0.4870740532541141) 9%, rgba(138,255,236,0.8372141092765231) 86%);
+}
+	
+
+#inquiryHistory {
+    font-family: "Inter", sans-serif;
+}
+
+#inquiryHistory > h2 {
+    text-align: left;
+    color: var(--text-teal);
+    padding: 20px 0;
+    border-top: 3px solid #474747;
+}
+
+#inquiryHistory p {
+    text-align: left;
+    font-size: 16px;
+    color: #666;
+    font-weight: bold;
+}
+
+.inquiryCard {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--text-teal)
+}
+
+.inquiryCard h2 {
+    font-size: 18px;
+    color: var(--text-teal);
+    margin-bottom: 5px;
+}
+
+.inquiryCard p {
+    font-size: 14px;
+    color: #000;
+    line-height: 1.4;
+}
+
+/* Status Styling */
+.inquiryCard p:last-child {
+    font-weight: bold;
+    color: green;
+}
+
+
+
+h2.form-title {
+    font-size: 28px; /* Larger and bold title */
+    margin-bottom: 20px; /* Space below title */
+    color: #333;
+    font-weight: bold;
+}
+
+
+
+
+.toggle-password:hover {
+    color: #0077B6; /* Change color on hover */
+}
+
+
+
+.toggle-password{
+    position: relative;
+    right: 40px;
+}
+
+
+.error-message {
+    color: red; /* Set text color to red */
+    font-size: 12px; /* Adjust font size */
+    margin-top: 5px; /* Add spacing between input and error message */
+    display: block; /* Ensure it takes up its own line */
+}
+
+</style>
 
 <% 
    String successMessage = (String) session.getAttribute("successMessage");
@@ -32,6 +324,9 @@
 
 <body>
 <%@ include file="/views/Util/components/header/header.jsp" %>
+<% 
+	List<Inquiry> inquiryList = InquiryDAO.getInquiriesByEmail(person.getEmail()); 
+	%>
 
 
 
@@ -42,6 +337,7 @@
             <ul>
                 <li class="active" data-tab="general">General</li>
                 <li data-tab="change-password">Change Password</li>
+                <li data-tab="inquiry">Inquiry</li>
                 <li data-tab="delete-account">Delete Account</li>
             </ul>
         </div>
@@ -118,15 +414,61 @@
 				    <button type="submit" id="updatePasswordSection" class="btn btn-primary">Save Changes</button>
                 </form>
             </div>
+            
 
             <!-- Delete Account Tab -->
             <div class="tab-content" id="delete-account">
                 <h2>Delete Account</h2>
                 <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-                <form action="<%=request.getContextPath()%>/DeletePersonServlet" method="POST" onsubmit="return confirmDelete()">
+                <form action="<%= request.getContextPath() %>/DeletePersonServlet" method="POST" onsubmit="return confirmDelete()">
                     <input type="hidden" name="userId" value="<%= person.getId() %>">
                     <button type="submit" class="btn btn-danger">Delete Account</button>
                 </form>
+            </div>
+            
+            <div class="tab-content" id="inquiry">
+                <div id="personInquiry">
+				    <div class="inquiryHeader">
+				        <h2>Get In Touch</h2>
+				    </div>
+				    <form action="${pageContext.request.contextPath}/Inquiry" method="post" id="inquiryForm">
+					<input type="text" id="name" name="name" value="<%=person.getName() %>" hidden=>
+					<input type="text" id="email" name="email" value="<%=person.getEmail() %>" hidden=>
+				    <!-- Name Field -->
+				    <!-- Problem Title -->
+				    <div class="form-group">
+				        <label for="title">Problem Title:</label>
+				        <input type="text" id="title" name="title" placeholder="Briefly summarize the issue" required>
+				    </div>
+				
+				    <!-- Description -->
+				    <div class="form-group">
+				        <label for="description">Description:</label>
+				        <textarea id="description" name="description" rows="5" placeholder="Describe the problem in detail" required></textarea>
+				    </div>
+				
+				    <!-- Submit Button -->
+				    <button type="submit">Submit Inquiry</button>
+				
+				</form>
+			
+			    </div>
+			    <div id="inquiryHistory">
+				    
+							    <h2>Past Inquiries</h2>
+				    <% if (inquiryList.isEmpty()) { %>
+				        <p>No past inquiries.</p>
+				    <% } else { %>
+				        <% for (Inquiry i : inquiryList) { %>
+				            <div class="inquiryCard">
+				                <h2>Title: <%= i.getTitle() %></h2>
+				                <p>Description: <%= i.getDescription() %></p>
+				                <p>Status: Solved</p>
+				            </div>
+				        <% } %>
+				    <% } %>
+				</div>
+
             </div>
         </div>
     </div>

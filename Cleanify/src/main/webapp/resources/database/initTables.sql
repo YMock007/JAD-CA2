@@ -81,9 +81,10 @@ CREATE TABLE Worker (
 CREATE TABLE Booking (
     id BIGSERIAL PRIMARY KEY,
     requester_id INT NOT NULL,
-    provider_id INT NULL, -- NULL initially, updated when a worker accepts the job
+    provider_id INT NULL, 
     service_id INT NOT NULL,
     status_id INT DEFAULT 1,
+    payment_id BIGINT NULL,
     date_requested DATE NOT NULL,
     time_requested TIME NOT NULL,
     phNumber VARCHAR(15) NOT NULL CHECK (phNumber ~ '^[0-9\+\-() ]+$'),
@@ -94,8 +95,10 @@ CREATE TABLE Booking (
     FOREIGN KEY (requester_id) REFERENCES Person(id) ON DELETE CASCADE,
     FOREIGN KEY (provider_id) REFERENCES Worker(provider_id) ON DELETE SET NULL,
     FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE,
-    FOREIGN KEY (status_id) REFERENCES Status(id) ON DELETE CASCADE
+    FOREIGN KEY (status_id) REFERENCES Status(id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_id) REFERENCES Payment(id) ON DELETE SET NULL -- Links to Payment
 );
+
 
 -- ✅ Create PaymentMethod table
 CREATE TABLE PaymentMethod (
@@ -103,11 +106,10 @@ CREATE TABLE PaymentMethod (
     name VARCHAR(50) NOT NULL UNIQUE CHECK (name IN ('Bank Card', 'QR Code'))
 );
 
--- ✅ Create Payment table
+-- ✅ Create Payment table (Updated)
 CREATE TABLE Payment (
     id SERIAL PRIMARY KEY,
     person_id INT NOT NULL,
-    booking_id INT NOT NULL UNIQUE,
     amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
     payment_method_id INT NOT NULL,
     payment_details BYTEA NOT NULL,
@@ -116,9 +118,9 @@ CREATE TABLE Payment (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE,
-    FOREIGN KEY (booking_id) REFERENCES Booking(id) ON DELETE CASCADE,
     FOREIGN KEY (payment_method_id) REFERENCES PaymentMethod(id) ON DELETE CASCADE
 );
+
 
 -- ✅ Create SavedCards table
 CREATE TABLE SavedCards (
@@ -152,52 +154,62 @@ CREATE TABLE Saved (
     FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE
 );
 
-
--- ✅ Function for creating bookings and payment
-CREATE OR REPLACE FUNCTION create_bookings_and_payment(
-    p_person_id INT,
-    p_services INT[],
-    p_status_id INT,
+CREATE OR REPLACE FUNCTION public.create_bookings_and_payment(
+    p_person_id INTEGER,
+    p_services INTEGER[],
+    p_status_id INTEGER,
     p_date_requested DATE,
-    p_time_requested TIME,
-    p_phNumber VARCHAR(15),
-    p_address VARCHAR(255),
-    p_postalCode VARCHAR(10),
+    p_time_requested TIME WITHOUT TIME ZONE,
+    p_phnumber VARCHAR,
+    p_address VARCHAR,
+    p_postalcode VARCHAR,
     p_remark TEXT,
-    p_amount DECIMAL(10,2),
-    p_payment_method_id INT,
+    p_amount NUMERIC(10,2),
+    p_payment_method_id INTEGER,
     p_payment_details BYTEA,
-    p_billing_address VARCHAR(255),
-    p_billing_postal_code VARCHAR(10),
+    p_billing_address VARCHAR,
+    p_billing_postal_code VARCHAR,
     OUT payment_id BIGINT
 ) 
-LANGUAGE plpgsql 
-AS $$ 
+RETURNS BIGINT
+LANGUAGE plpgsql
+COST 100
+VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
     new_booking_id BIGINT;
     booking_ids BIGINT[];
     service_id INT;
 BEGIN
     BEGIN
+        -- Step 1: Insert into Payment table first
+        INSERT INTO Payment (
+            person_id, amount, payment_method_id, payment_details, billing_address, billing_postal_code
+        ) VALUES (
+            p_person_id, p_amount, p_payment_method_id, p_payment_details, 
+            CASE WHEN p_payment_method_id = 1 THEN p_billing_address ELSE NULL END,
+            CASE WHEN p_payment_method_id = 1 THEN p_billing_postal_code ELSE NULL END
+        )
+        RETURNING id INTO payment_id;
+
+        -- Step 2: Insert bookings with the retrieved payment_id
         booking_ids := '{}';
         FOREACH service_id IN ARRAY p_services LOOP
-            INSERT INTO Booking (requester_id, service_id, status_id, date_requested, time_requested, phNumber, address, postalCode, remark)
-            VALUES (p_person_id, service_id, p_status_id, p_date_requested, p_time_requested, p_phNumber, p_address, p_postalCode, p_remark)
+            INSERT INTO Booking (
+                requester_id, service_id, status_id, date_requested, time_requested, phNumber, address, postalCode, remark, payment_id
+            ) VALUES (
+                p_person_id, service_id, p_status_id, p_date_requested, p_time_requested, p_phNumber, p_address, p_postalCode, p_remark, payment_id
+            )
             RETURNING id INTO new_booking_id;
+            
             booking_ids := array_append(booking_ids, new_booking_id);
         END LOOP;
-
-        INSERT INTO Payment (person_id, booking_id, amount, payment_method_id, payment_details, billing_address, billing_postal_code)
-        VALUES (p_person_id, booking_ids[1], p_amount, p_payment_method_id, p_payment_details, 
-            CASE WHEN p_payment_method_id = 1 THEN p_billing_address ELSE NULL END,
-            CASE WHEN p_payment_method_id = 1 THEN p_billing_postal_code ELSE NULL END)
-        RETURNING id INTO payment_id;
     EXCEPTION
         WHEN OTHERS THEN
             RAISE EXCEPTION 'Error in create_bookings_and_payment: %', SQLERRM;
     END;
 END;
-$$;
+$BODY$;
 
 CREATE TABLE WorkerCategory (
     worker_id INT NOT NULL,

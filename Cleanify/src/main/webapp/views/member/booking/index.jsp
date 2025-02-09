@@ -21,8 +21,9 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+        	position: relative;
+            background: linear-gradient(#eceffe, #ced6fb);
+            min-height:100vh
         }
 
         h1 {
@@ -90,6 +91,15 @@
 		.rating-stars input:checked ~ label {
 		    color: gold;
 		}
+		
+		.noItemText {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    text-align: center;
+		}
+
     </style>
 </head>
 <body>
@@ -97,7 +107,7 @@
     <%@ include file="/views/Util/notification.jsp" %>
 
     <div class="container">
-    	<h1>My Bookings</h1>
+    	
 
 	    <%
 	        // Retrieve the list of bookings
@@ -106,6 +116,7 @@
 	
 	    <!-- Only show filter if there are bookings -->
 	    <% if (bookings != null && !bookings.isEmpty()) { %>
+	    	<h1>My Bookings</h1>
 	        <!-- Filter by Status -->
 	        <label for="statusId">Filter by Status:</label>
 	        <select id="statusId" class="form-select w-auto">
@@ -181,7 +192,7 @@
 			                <% 
 			                    } else { 
 			                %>
-			                    <button class="btn btn-secondary" disabled>Not Available</button>
+			                    <button class="btn btn-secondary" disabled>Unavailable</button>
 			                <% } %>
 			            </td>
 			        </tr>
@@ -192,9 +203,9 @@
 			    <% 
 			        } else {
 			    %>
-			        <tr>
-			            <td colspan="9">No bookings found.</td>
-			        </tr>
+			        <div class="noItemText">
+			        	<span>You have no bookings yet!</span>
+			        </div>
 			    <% 
 			        }
 			    %>
@@ -256,5 +267,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
