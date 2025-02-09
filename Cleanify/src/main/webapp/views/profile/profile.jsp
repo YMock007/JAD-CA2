@@ -335,11 +335,18 @@ h2.form-title {
         <!-- Sidebar -->
         <div class="sidebar">
             <ul>
-                <li class="active" data-tab="general">General</li>
-                <li data-tab="change-password">Change Password</li>
-                <li data-tab="inquiry">Inquiry</li>
-                <li data-tab="delete-account">Delete Account</li>
-            </ul>
+			    <li class="active" data-tab="general">General</li>
+			    <li data-tab="change-password">Change Password</li>
+			    
+			    <% if (person.getRoleId() != 1) { %>
+			        <li data-tab="inquiry">Inquiry</li>
+			    <% } %>
+			
+			    <% if (person.getRoleId() != 1) { %>
+			        <li data-tab="delete-account">Delete Account</li>
+			    <% } %>
+			</ul>
+
         </div>
 
         <!-- Main Content -->
