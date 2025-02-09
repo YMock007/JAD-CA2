@@ -64,7 +64,7 @@ public class InquiryServlet extends HttpServlet {
 	            return;
 	        }
 
-	        if (!title.matches("^[a-zA-Z0-9\\s]{3,50}$")) {
+	        if (!title.matches("^[a-zA-Z0-9\\s]{3,200}$")) {
 	            setSessionMessage(request, "Invalid title. Only letters, numbers, and spaces are allowed (3-50 characters).", "error");
 	            response.sendRedirect(request.getHeader("Referer"));
 	            return;

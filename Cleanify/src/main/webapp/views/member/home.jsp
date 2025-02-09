@@ -13,7 +13,6 @@
     		font-family: Arial, sans-serif;
             background: rgb(20,155,159);
 			background: linear-gradient(180deg, rgba(20,155,159,0.9) 20%, rgba(255,255,255,1) 50%, rgba(20,155,159,0.6) 80%);
-
             position: relative;
 }
 	
@@ -21,11 +20,12 @@
 			max-width: 1280px;
 			margin: 0 auto;
 		}
-        /* Intro Section */
+
         #intro-section {
             min-height: 90vh;
             display: grid;
             align-items: center;
+            gap: 40px;
             justify-content: space-between;
             grid-template-columns: 1fr 1fr;
             

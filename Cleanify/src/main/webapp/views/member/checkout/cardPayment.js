@@ -35,7 +35,7 @@ document.getElementById('submit-payment').addEventListener('click', function (ev
     var appointmentDate = document.getElementById('appointmentDate').value;
     var appointmentTime = document.getElementById('appointmentTime').value.trim();
     var amount = document.getElementById('totalPrice').value.trim();
-    amount = Math.round(parseFloat(amount) * 100); // Convert amount to cents
+    amount = Math.round(parseFloat(amount));
 
     // ✅ Construct billing address (combine address and city)
     let billingFullAddress = document.getElementById('billingAddress').value.trim() + ", " +
