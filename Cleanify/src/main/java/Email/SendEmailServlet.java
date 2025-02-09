@@ -66,6 +66,7 @@ public class SendEmailServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
+        	setSessionMessage(request, "Processing...Please wait for a while...", "success");
             String email = request.getParameter("email");
             String amountStr = request.getParameter("totalPrice");
             String memberId = request.getParameter("memberId").trim();
@@ -138,7 +139,7 @@ public class SendEmailServlet extends HttpServlet {
 
             boolean emailSent = sendEmailWithQR(email, "Your Cleanify Payment Request – Secure Your Appointment!", messageBody, qrImage);
             if (emailSent) {
-
+            	setSessionMessage(request, "Processing...Please wait for a while...", "success");
                 boolean bookingCreated = createBooking(
                         request.getContextPath() + "/BookingServlet", 
                         memberId, phoneNumber, address, postalCode, 
@@ -188,6 +189,7 @@ public class SendEmailServlet extends HttpServlet {
     }
 
     private boolean sendEmailWithQR(String toEmail, String subject, String messageBody, BufferedImage qrImage) {
+    	
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
@@ -242,6 +244,7 @@ public class SendEmailServlet extends HttpServlet {
                                   String appointmentTime, String paymentIntentId, long amount, 
                                   String billingAddress, String billingPostalCode, String bookingCartStr) {
         try {
+        	
             String fullUrl = "http://localhost:8080" + bookingUrl;  
             URL url = new URL(fullUrl);
             System.out.println(url);

@@ -24,6 +24,7 @@ public class BookingServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+        	setSessionMessage(request, "Processing...Please wait for a while...", "success");
             String paymentIntentId = request.getParameter("paymentIntentId");
             if (paymentIntentId == null || paymentIntentId.isEmpty()) {
                 setSessionMessage(request, "Payment verification failed. Try again.", "error");

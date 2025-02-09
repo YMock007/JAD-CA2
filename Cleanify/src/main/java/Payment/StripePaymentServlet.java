@@ -39,6 +39,7 @@ public class StripePaymentServlet extends HttpServlet {
         JSONObject jsonResponse = new JSONObject();
 
         try {
+        	
             // ✅ Retrieve and validate parameters
             String paymentMethodId = request.getParameter("paymentMethodId");
             String amountStr = request.getParameter("amount");

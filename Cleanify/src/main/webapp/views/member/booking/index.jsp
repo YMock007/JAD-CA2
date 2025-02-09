@@ -167,7 +167,7 @@
 			                if(booking.getProviderId()==0){
 			                	cleanerName = "TBD";
 			                }else{
-			                	cleanerName = PersonList.getPersonById(booking.getProviderId()).getName();
+			                	cleanerName = PersonList.getCleanerNameById(booking.getProviderId());
 			                }
 			        %>
 			        <tr>
