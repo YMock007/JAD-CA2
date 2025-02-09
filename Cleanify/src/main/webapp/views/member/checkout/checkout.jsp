@@ -253,6 +253,17 @@
 	            <div class="form-group">
 	                <label for="appointmentDate">Appointment Date</label>
 	                <input type="date" id="appointmentDate" name="appointmentDate" required>
+					<script>
+					    document.addEventListener("DOMContentLoaded", function() {
+					        let dateInput = document.getElementById("appointmentDate");
+					        let today = new Date();
+					        today.setDate(today.getDate() + 1); // Set to tomorrow
+					
+					        let minDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+					        dateInput.min = minDate;
+					    });
+					</script>
+
 	            </div>
 	
 	            <!-- Appointment Time -->

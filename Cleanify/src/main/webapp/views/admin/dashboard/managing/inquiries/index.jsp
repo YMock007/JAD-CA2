@@ -85,7 +85,7 @@
                     <td><%= inquiry.getTitle() %></td>
                     <td><%= inquiry.getDescription() %></td>
                     <td class="text-center">
-                        <form action="<%= request.getContextPath() %>/admin/inquiries" method="post">
+                        <form action="<%= request.getContextPath() %>/InquiryAdminServlet" method="post">
                             <input type="hidden" name="id" value="<%= inquiry.getId() %>">
                             <input type="hidden" name="action" value="complete">
                             <button type="submit" class="btn btn-success">Update Complete</button>
