@@ -25,6 +25,7 @@ public class WorkerController {
 	public ResponseEntity<String> registerWorker(@RequestBody WorkerDTO workerDTO) throws SQLException {
 		System.out.println("Sending JSON: " + workerDTO.toString());
 		
+		System.out.println("Sending JSON: " + workerDTO.toString());
 		WorkerDAO WorkerDAO = new WorkerDAO();
         boolean isRegistered = WorkerDAO.registerWorker(workerDTO);
 

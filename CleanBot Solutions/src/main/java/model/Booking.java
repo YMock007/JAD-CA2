@@ -14,7 +14,9 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(int id, String dateRequested, String timeRequested, String address, String postalCode, String remark, ServiceDetails service, String requesterName, String requesterPhone) {
+    public Booking(int id, String dateRequested, String timeRequested, String address, 
+                   String postalCode, String remark, ServiceDetails service, 
+                   String requesterName, String requesterPhone) {
         this.id = id;
         this.dateRequested = dateRequested;
         this.timeRequested = timeRequested;
@@ -22,76 +24,37 @@ public class Booking {
         this.postalCode = postalCode;
         this.remark = remark;
         this.service = service;
-        this.requesterName = requesterName;
-        this.requesterPhone = requesterPhone;
+        this.requesterName = requesterName != null ? requesterName : "Unknown";  // ✅ Prevent null values
+        this.requesterPhone = requesterPhone != null ? requesterPhone : "Not Available";
         this.accepted = false;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getDateRequested() { return dateRequested; }
+    public void setDateRequested(String dateRequested) { this.dateRequested = dateRequested; }
 
-    public String getDateRequested() {
-        return dateRequested;
-    }
+    public String getTimeRequested() { return timeRequested; }
+    public void setTimeRequested(String timeRequested) { this.timeRequested = timeRequested; }
 
-    public void setDateRequested(String dateRequested) {
-        this.dateRequested = dateRequested;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getTimeRequested() {
-        return timeRequested;
-    }
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
 
-    public void setTimeRequested(String timeRequested) {
-        this.timeRequested = timeRequested;
-    }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
 
-    public String getAddress() {
-        return address;
-    }
+    public ServiceDetails getService() { return service; }
+    public void setService(ServiceDetails service) { this.service = service; }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public String getRequesterName() { return requesterName; }
+    public void setRequesterName(String requesterName) { this.requesterName = requesterName; }  // ✅ Add Setter
 
-    public String getPostalCode() {
-        return postalCode;
-    }
+    public String getRequesterPhone() { return requesterPhone; }
+    public void setRequesterPhone(String requesterPhone) { this.requesterPhone = requesterPhone; }  // ✅ Add Setter
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public ServiceDetails getService() {
-        return service;
-    }
-
-    public void setService(ServiceDetails service) {
-        this.service = service;
-    }
-
-    public String getRequesterName() {
-        return accepted ? requesterName : "Hidden";  // ✅ Show only if accepted
-    }
-
-    public String getRequesterPhone() {
-        return accepted ? requesterPhone : "Hidden";  // ✅ Show only if accepted
-    }
-
-    public void acceptBooking() {
-        this.accepted = true;
-    }
+    public void acceptBooking() { this.accepted = true; }
 }

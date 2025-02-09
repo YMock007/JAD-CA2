@@ -16,7 +16,7 @@
         }
 
         .navbar {
-            height: 50px;
+            height: 30px;
         }
 
         .container {
@@ -173,7 +173,12 @@
                 <p><strong>Time:</strong> <%= booking.getTimeRequested() %></p>
                 <p><strong>Price:</strong> $<%= booking.getService().getPrice() %></p>
             </div>
-            <button class="btn-accept">Accept Booking</button>
+            <form action="<%= request.getContextPath() %>/AcceptBookingServlet" method="POST">
+            	<input type="hidden" name="workerId" value="<%= userSession.getAttribute("workerId") %>">
+                <input type="hidden" name="bookingId" value="<%= booking.getId() %>">
+                <input type="hidden" name="statusId" value="4">
+                <button type="submit" class="btn-accept">Accept Booking</button>
+            </form>
         </div>
         <% } } } %>
     </div>
@@ -229,12 +234,40 @@
             booking.style.display = (matchesService && matchesDate) ? "block" : "none";
         });
 
-        totalPages = Math.ceil(filteredCount / itemsPerPage);
-
-        totalPages = Math.ceil(filteredCount / itemsPerPage);
-        showPage(1);;
+        if (searchService === "" && filterDate === "") {
+            resetPagination();
+        } else {
+            totalPages = Math.ceil(visibleCount / itemsPerPage);
+            showPage(1);
+        }
     }
-    
+
+    function resetPagination() {
+        bookings.forEach(booking => {
+            booking.style.display = "flex"; // Show all bookings
+        });
+
+        totalPages = Math.ceil(bookings.length / itemsPerPage);
+        showPage(1);
+    }
+
+    // ✅ Fix: Detect when search box is **manually cleared** (backspace/delete)
+    document.getElementById("searchService").addEventListener("input", (event) => {
+        if (event.target.value.trim() === "") {
+            resetPagination();
+        } else {
+            filterBookings();
+        }
+    });
+
+    // ✅ Fix: Detect when date filter is **manually cleared**
+    document.getElementById("filterDate").addEventListener("input", (event) => {
+        if (event.target.value.trim() === "") {
+            resetPagination();
+        } else {
+            filterBookings();
+        }
+    });
 
 
 
@@ -244,8 +277,12 @@
         showPage(1);;
     }
 
+
+
     window.onload = () => showPage(1);
 </script>
 
 </body>
 </html>
+
+

@@ -85,6 +85,12 @@ public class LogInServlet extends HttpServlet {
         session.setAttribute("workerEmail", worker.getEmail());
         session.setAttribute("workerRole", worker.getRoleId());
         session.setAttribute("workerCategories", workerCategories);
+        System.out.println("Session Worker ID: " + session.getAttribute("workerId"));
+        System.out.println("Session Worker Name: " + session.getAttribute("workerName"));
+        System.out.println("Session Worker Email: " + session.getAttribute("workerEmail"));
+        System.out.println("Session Worker Role: " + session.getAttribute("workerRole"));
+        System.out.println("Session Worker Categories: " + session.getAttribute("workerCategories"));
+
         
         List<BookingCategory> bookings = BookingServiceClient.fetchAvailableBookings();
         session.setAttribute("availableBookings", bookings);

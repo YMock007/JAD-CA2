@@ -10,8 +10,7 @@ public class Worker {
     private int[] categoryIds;
 
     public Worker() {}
-
-    public Worker(String name, String email, String phone, String password,int role_id, int[] categoryIds) {
+    public Worker(String name, String email, String phone, String password, int role_id, int[] categoryIds) {
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -19,6 +18,18 @@ public class Worker {
         this.role_id = role_id;
         this.categoryIds = categoryIds;
     }
+
+
+    public Worker(int id, String name, String email, String phone, String password, int role_id, int[] categoryIds) {
+        this.id = id;  // ✅ Store worker ID properly
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.role_id = role_id;
+        this.categoryIds = categoryIds;
+    }
+
 
 	public int getId() {
 		return id;

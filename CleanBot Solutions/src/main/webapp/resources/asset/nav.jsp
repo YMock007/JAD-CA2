@@ -8,16 +8,10 @@
         </div>
         <nav>
             <ul>
-                <li><a href="${pageContext.request.contextPath}/bookings.jsp">📅 Bookings</a></li>
-                <li><a href="${pageContext.request.contextPath}/accepted-bookings.jsp">✅ Accepted</a></li>
-                <li><a href="${pageContext.request.contextPath}/completed.jsp">🏆 Completed</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropbtn">👤 Profile</a>
-                    <div class="dropdown-content">
-                        <a href="${pageContext.request.contextPath}/profile.jsp">View Profile</a>
-                        <a href="${pageContext.request.contextPath}/settings.jsp">Settings</a>
-                        <a href="${pageContext.request.contextPath}/logout.jsp">Logout</a>
-                    </div>
+                <li><a href="${pageContext.request.contextPath}/views/home/home.jsp">📅 Bookings</a></li>
+                <li><a href="${pageContext.request.contextPath}/views/accepted-jobs/acceptedJobs.jsp">✅ Accepted</a></li>
+                <li><a href="${pageContext.request.contextPath}/views/completed-jobs/completedJobs.jsp">🏆 Completed</a></li>
+                <li><a href="${pageContext.request.contextPath}/views/profile/profile.jsp" class="dropbtn">👤 Profile</a>	
                 </li>
             </ul>
         </nav>

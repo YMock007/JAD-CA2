@@ -138,7 +138,7 @@ public class WorkerDAO {
                 int[] categoryIds = getCategoryIdsByWorkerId(workerId);
 
                 // ✅ Use the existing Worker constructor
-                worker = new Worker(name, retrievedEmail, phone, password, roleId, categoryIds);
+                worker = new Worker(workerId,name, retrievedEmail, phone, password, roleId, categoryIds);
             }
         } catch (SQLException e) {
             e.printStackTrace();
