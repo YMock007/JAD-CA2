@@ -2,7 +2,7 @@
     <wb-module deploy-name="CleanBot Solutions">
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <property name="context-root" value="CleanBot Solutions"/>
+        <property name="context-root" value="CleanBot_Solutions"/>
         <property name="java-output-path" value="/CleanBot Solutions/build/classes"/>
     </wb-module>
 </project-modules>
