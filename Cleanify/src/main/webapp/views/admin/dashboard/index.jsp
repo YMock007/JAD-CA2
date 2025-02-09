@@ -17,6 +17,7 @@
             <div class="admin-links">
                 <a href="managing/categories-services/index.jsp" class="btn btn-primary">Categories & Services</a>
                 <a href="managing/members/index.jsp" class="btn btn-info">Members</a>
+                <a href="managing/inquiries/index.jsp" class="btn btn-warning">Inquiries</a>
             </div>
         </section>
 

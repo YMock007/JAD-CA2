@@ -48,15 +48,17 @@ CREATE TABLE Person (
     FOREIGN KEY (role_id) REFERENCES Role(id) ON DELETE CASCADE
 );
 
+-- ✅ Create Inquiry table with status_id
 CREATE TABLE Inquiry (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status_id INT DEFAULT 1,
+    FOREIGN KEY (status_id) REFERENCES Status(id) ON DELETE SET DEFAULT
 );
-
 
 -- ✅ Create Service table
 CREATE TABLE Service (

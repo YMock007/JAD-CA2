@@ -3,7 +3,7 @@ package Inquiry;
 import java.time.LocalDateTime;
 
 public class Inquiry {
-
+	private int id;
 	private String name;
 	private String email;
 	private String title;
@@ -24,6 +24,13 @@ public class Inquiry {
 		this.email = email;
 		this.title = title;
 		this.description = description;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	public String getName() {
