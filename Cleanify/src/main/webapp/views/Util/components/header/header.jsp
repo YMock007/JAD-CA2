@@ -93,7 +93,7 @@
                         <% if (person.getRoleId() == 1) { %> 
                             <!-- Admin Navigation -->
                             <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/views/admin/dashboard/managing/index.jsp">Admin Dashboard</a>
+                                <a class="nav-link" href="${pageContext.request.contextPath}/views/admin/dashboard/index.jsp">Admin Dashboard</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="${pageContext.request.contextPath}/views/profile/profile.jsp">User Profile</a>

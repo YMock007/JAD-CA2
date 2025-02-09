@@ -21,22 +21,21 @@ INSERT INTO Status (name) VALUES
 
 -- Insert sample persons
 INSERT INTO Person (name, password, email, phNumber, address, postalCode, role_id, is_google_user) VALUES 
-    ('john_doe', 'password123', 'john@example.com', '1234567890', '123 Main St', '123456', 2, FALSE),
-    ('jane_smith', 'password456', 'jane@example.com', NULL, '456 Elm St', '654321', 3, FALSE),
-    ('alice_johnson', 'password789', 'alice@example.com', '9876543210', '789 Oak St', '789012', 1, FALSE),
-    ('bob_williams', 'password321', 'bob@example.com', NULL, '101 Pine St', '345678', 2, FALSE),
-    ('carol_white', 'password654', 'carol@example.com', '5647382910', '202 Maple St', '890123', 3, FALSE),
-    ('dave_black', 'password987', 'dave@example.com', '3456789012', '303 Birch St', '456789', 1, FALSE),
-    ('eve_green', 'password111', 'eve@example.com', '1234567891', '404 Cedar St', '567890', 2, FALSE),
-    ('frank_brown', 'password222', 'frank@example.com', NULL, '505 Palm St', '678901', 3, FALSE),
-    ('grace_blue', 'password333', 'grace@example.com', '6789012345', '606 Fir St', '789012', 1, FALSE),
-    ('hank_gray', 'password444', 'hank@example.com', NULL, '707 Poplar St', '890123', 2, FALSE),
-    ('mike_cleaner', 'password123', 'mike@example.com', '912345678', '88 Cleaning St', '123123', 3, FALSE),
-    ('sarah_repair', 'password456', 'sarah@example.com', '923456789', '77 Repair Ave', '234234', 3, FALSE),
-    ('tom_hvac', 'password789', 'tom@example.com', '934567890', '66 HVAC Rd', '345345', 3, FALSE),
-    ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '456456', 3, FALSE),
-    ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '567567', 3, FALSE);
-
+    ('john_doe', 'password123', 'john@example.com', '1234567890', '123 Main St', '018925', 2, FALSE),
+    ('jane_smith', 'password456', 'jane@example.com', NULL, '456 Elm St', '048618', 3, FALSE),
+    ('alice_johnson', 'password789', 'alice@example.com', '9876543210', '789 Oak St', '058362', 1, FALSE),
+    ('bob_williams', 'password321', 'bob@example.com', NULL, '101 Pine St', '059443', 2, FALSE),
+    ('carol_white', 'password654', 'carol@example.com', '5647382910', '202 Maple St', '059815', 3, FALSE),
+    ('dave_black', 'password987', 'dave@example.com', '3456789012', '303 Birch St', '069119', 1, FALSE),
+    ('eve_green', 'password111', 'eve@example.com', '1234567891', '404 Cedar St', '098269', 2, FALSE),
+    ('frank_brown', 'password222', 'frank@example.com', NULL, '505 Palm St', '109679', 3, FALSE),
+    ('grace_blue', 'password333', 'grace@example.com', '6789012345', '606 Fir St', '117386', 1, FALSE),
+    ('hank_gray', 'password444', 'hank@example.com', NULL, '707 Poplar St', '129580', 2, FALSE),
+    ('mike_cleaner', 'password123', 'mike@example.com', '912345678', '88 Cleaning St', '138677', 3, FALSE),
+    ('sarah_repair', 'password456', 'sarah@example.com', '923456789', '77 Repair Ave', '139345', 3, FALSE),
+    ('tom_hvac', 'password789', 'tom@example.com', '934567890', '66 HVAC Rd', '149729', 3, FALSE),
+    ('linda_pest', 'password321', 'linda@example.com', '945678901', '55 Pest St', '158792', 3, FALSE),
+    ('chris_install', 'password654', 'chris@example.com', '956789012', '44 Install Ln', '168731', 3, FALSE);
 
     INSERT INTO Inquiry (email, username, title, description, created_at) VALUES 
     ('john@example.com', 'John Doe', 'Login Issue', 'I cannot log into my account. Please help.', '2024-02-08 09:30:00'),
@@ -83,18 +82,10 @@ INSERT INTO Service (name, category_id, description, price, image_url, est_durat
     ('Appliance Installation', 5, 'Professional appliance setup.', 150.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/ApplianceInstallation.jpg', 3),
     ('Furniture Assembly', 5, 'Secure assembly of furniture.', 130.00, 'https://res.cloudinary.com/dr7rxzsgz/image/upload/v1738572872/cleaning_service/furnitureAssembly.jpg', 1);
 
--- Insert sample bookings (No provider assigned, Status = Pending)
-INSERT INTO Booking (requester_id, provider_id, service_id, status_id, date_requested, time_requested, phNumber, address, postalCode, remark) VALUES
-    (1, NULL, 1, 1, '2024-12-01', '09:00:00', '1234567890', '123 Main St', '123456', 'Customer requested eco-friendly cleaning'),
-    (2, NULL, 3, 1, '2024-12-02', '10:00:00', '2345678901', '456 Elm St', '654321', 'Electrical inspection needed'),
-    (3, NULL, 5, 1, '2024-12-03', '11:00:00', '3456789012', '789 Oak St', '789012', 'Lawn maintenance for front and backyard'),
-    (4, NULL, 7, 1, '2024-12-04', '14:00:00', '4567890123', '202 Maple St', '890123', 'Emergency pest control service'),
-    (5, NULL, 8, 1, '2024-12-05', '15:00:00', '5678901234', '303 Birch St', '456789', 'Appliance installation for new fridge'),
-    (6, NULL, 2, 1, '2024-12-06', '16:00:00', '6789012345', '404 Cedar St', '567890', 'Plumbing leak in the kitchen'),
-    (7, NULL, 4, 1, '2024-12-07', '17:00:00', '7890123456', '505 Palm St', '678901', 'HVAC maintenance before winter'),
-    (8, NULL, 6, 1, '2024-12-08', '18:00:00', '8901234567', '606 Fir St', '789012', 'Pool maintenance before holiday season'),
-    (9, NULL, 9, 1, '2024-12-09', '19:00:00', '9012345678', '707 Poplar St', '890123', 'Furniture assembly for new apartment'),
-    (10, NULL, 1, 1, '2024-12-10', '20:00:00', '0123456789', '808 Willow St', '901234', 'Deep cleaning for move-in');
+-- ✅ Populate Worker Table from Person Table (Ensures valid providers)
+INSERT INTO Worker (provider_id, name)
+SELECT id, name FROM Person WHERE role_id = 3
+ON CONFLICT (provider_id) DO NOTHING;
     
 
 INSERT INTO Worker (provider_id, name) VALUES
