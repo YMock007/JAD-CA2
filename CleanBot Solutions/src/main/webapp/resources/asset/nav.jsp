@@ -11,7 +11,6 @@
                 <li><a href="${pageContext.request.contextPath}/views/home/home.jsp">📅 Bookings</a></li>
                 <li><a href="${pageContext.request.contextPath}/views/accepted-jobs/acceptedJobs.jsp">✅ Accepted</a></li>
                 <li><a href="${pageContext.request.contextPath}/views/completed-jobs/completedJobs.jsp">🏆 Completed</a></li>
-                <li><a href="${pageContext.request.contextPath}/views/profile/profile.jsp" class="dropbtn">👤 Profile</a>	
                 </li>
             </ul>
         </nav>

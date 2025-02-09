@@ -28,10 +28,10 @@ public class InquiryServlet extends HttpServlet {
                 } else {
                     setSessionMessage(request, "Failed to update inquiry status.", "error");
                 }
-                doGet(request, response);
+                redirectBack(request, response);
                 return;
             }
-            
+
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String title = request.getParameter("title");
@@ -42,29 +42,41 @@ public class InquiryServlet extends HttpServlet {
                 title == null || title.trim().isEmpty() || 
                 description == null || description.trim().isEmpty()) {
                 setSessionMessage(request, "All fields are required.", "error");
-                doGet(request, response);
+                redirectBack(request, response);
                 return;
             }
 
             Inquiry reqInquiry = new Inquiry(name, email, title, description);
             boolean isCreated = InquiryDAO.createInquiry(reqInquiry);
-            
+
             if(isCreated) {
                 setSessionMessage(request, "Submission successful!", "success");
             } else {
                 setSessionMessage(request, "Submission failed, please try again!", "error");
             }
-            doGet(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             setSessionMessage(request, "An error occurred while processing your request.", "error");
-            doGet(request, response);
+        }
+        redirectBack(request, response);
+    }
+
+    // Helper method to redirect back to the referring page
+    private void redirectBack(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String referer = request.getHeader("referer"); // Get the previous page URL
+        if (referer != null && !referer.isEmpty()) {
+            response.sendRedirect(referer); // Redirect back to the previous page
+        } else {
+            response.sendRedirect("defaultPage.jsp"); // Fallback page if referer is unavailable
         }
     }
+
 
     private void setSessionMessage(HttpServletRequest request, String message, String status) {
         HttpSession session = request.getSession();
         session.setAttribute("message", message);
         session.setAttribute("status", status);
     }
+    
+    
 }
