@@ -33,7 +33,7 @@
                                pattern="^[A-Za-z0-9\s]+$"
                                title="Category name can only contain letters, numbers, and spaces." />
                     </div>
-                    <button type="submit" class="btn btn-success" onclick="validateAndSubmit(this)">
+                    <button type="submit" class="btn btn-success">
                         Add Category
                     </button>
                 </form>
@@ -107,7 +107,7 @@
 
                     <!-- Submit Button -->
                     <div class="text-right">
-                        <button type="submit" class="btn btn-success font-weight-bold" onclick="validateAndSubmit(this)">
+                        <button type="submit" class="btn btn-success font-weight-bold">
                             <i class="fas fa-plus-circle"></i> Add Service
                         </button>
                     </div>

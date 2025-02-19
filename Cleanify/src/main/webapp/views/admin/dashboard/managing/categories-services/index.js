@@ -6,7 +6,6 @@ function validateAndSubmit(button) {
     const form = button.form;
     const inputs = form.querySelectorAll("input, textarea, select");
 
-    // Validate form inputs
     for (const input of inputs) {
         // Ignore file input fields
         if (input.type === "file") continue;
@@ -35,39 +34,17 @@ function validateAndSubmit(button) {
         button.innerText = "Deleting...";
     }
 
-    // Submit the form asynchronously
-    const formData = new FormData(form);
+    // Submit the form programmatically
+    form.submit();
 
-    fetch(form.action, {
-        method: form.method,
-        body: formData,
-    })
-        .then((response) => {
-            if (response.ok) {
-                // Form submission successful
-                button.innerText = "Success!";
-                setTimeout(() => {
-                    button.innerText = originalText;
-                    button.disabled = false;
-                    return true;
-                }, 2000);
-            } else {
-                // Form submission failed
-                response.text().then((text) => alert(`Failed: ${text}`));
-                button.innerText = originalText;
-                button.disabled = false;
-            }
-        })
-        .catch((error) => {
-            // Handle fetch errors
-            alert(`Error: ${error.message}`);
-            button.innerText = originalText;
-            button.disabled = false;
-        });
+    // Reset the button state after 5 seconds
+    setTimeout(() => {
+        button.disabled = false;
+        button.innerText = originalText;
+    }, 5000);
 
-    return false; // Prevent the default form submission
+    return true; // Allow the form submission to proceed
 }
-
 
 /**
  * Prevent card collapse when clicking specific buttons
